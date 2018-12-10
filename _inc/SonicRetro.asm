@@ -256,7 +256,7 @@ RObj03_Main:
 		move.l	#Map_RObj03,4(a0)
 		move.w	#0,2(a0)
 		move.b	#0,1(a0)
-		move.b	#0,priority(a0)
+		move.w	#0,priority(a0)
 
 RObj03_Disp:
 		jmp	DisplaySprite
