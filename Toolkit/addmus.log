@@ -1,0 +1,20 @@
+PowerBASIC Console Compiler
+PB/CC   Version 5.00 
+Copyright (c) 1998-2008 PowerBasic Inc.
+Venice, Florida USA
+All Rights Reserved
+
+Primary source:  D:\DOKUME~1\Segata\Desktop\SMPSPLAY\RELEASE\Toolkit\addmus.bas   {88 total lines}
+Target compilation:  addmus.exe
+Compile time:  0.1 seconds, at 105600 lines/minute
+
+3436 bytes compiled code, 18973 bytes RTLibrary,
+572 bytes string literals, and 2472 bytes dgroup.
+Executable stack size:  1048576 bytes.
+Disk image: 27648 bytes   Memory image: 22017 bytes.
+
+Component Files:
+----------------
+D:\DOKUME~1\Segata\Desktop\SMPSPLAY\RELEASE\Toolkit\addmus.bas
+
+

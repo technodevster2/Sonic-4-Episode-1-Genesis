@@ -1,0 +1,32 @@
+{
+    "description": "Flex 2 Project File",
+    "name": "Sonic Sprite",
+    "objects": [
+        {
+            "name": "SonicArt",
+            "palettes": [
+                {
+                    "path": "..\\pallet\\sonic.bin",
+                    "length": 1
+                }
+            ],
+            "art": {
+                "path": "..\\artunc\\sonic.bin",
+                "compression": "Uncompressed"
+            },
+            "mappings": {
+                "path": "..\\_maps\\Sonic.asm",
+                "format": "Sonic 1",
+                "customDefinition": "",
+                "label": "SonicMap"
+            },
+            "dplcs": {
+                "enabled": true,
+                "path": "..\\_inc\\Sonic dynamic pattern load cues.asm",
+                "format": "Sonic 1",
+                "customDefinition": "",
+                "label": "SonicDPLC"
+            }
+        }
+    ]
+}

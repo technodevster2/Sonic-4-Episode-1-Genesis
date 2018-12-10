@@ -1,0 +1,20 @@
+PowerBASIC Console Compiler
+PB/CC   Version 5.00 
+Copyright (c) 1998-2008 PowerBasic Inc.
+Venice, Florida USA
+All Rights Reserved
+
+Primary source:  I:\SMPSPLAY\Toolkit\addpcm.bas   {60 total lines}
+Target compilation:  addpcm.exe
+Compile time:  0.1 seconds, at 72000 lines/minute
+
+2060 bytes compiled code, 15839 bytes RTLibrary,
+488 bytes string literals, and 2380 bytes dgroup.
+Executable stack size:  1048576 bytes.
+Disk image: 22528 bytes   Memory image: 18707 bytes.
+
+Component Files:
+----------------
+I:\SMPSPLAY\Toolkit\addpcm.bas
+
+

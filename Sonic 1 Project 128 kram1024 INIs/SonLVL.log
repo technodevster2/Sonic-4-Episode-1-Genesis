@@ -1,0 +1,93 @@
+Operating system: Microsoft Windows NT 6.2.9200.0
+Opening INI file "C:\Users\DevelopersComp\Downloads\Source Code\Sonic-4-Episode-1-Genesis\Sonic 1 Project 128 kram1024 INIs\S1LVL.ini"...
+Game type is S1.
+Loading Green Hill Zone Act 1...
+Loading palette file "../pallet/sonic.bin"...
+Source: 0 Destination: 0 Length: 16
+Loading 128x128 chunks from file "../map256/GHZ.bin", using compression Kosinski...
+Loading 16x16 blocks from file "../map16/GHZ.bin", using compression Kosinski...
+Loading 8x8 tiles from file "../artnem/8x8ghz.bin", using compression Nemesis...
+Loading palette file "../pallet/ghz.bin"...
+Source: 0 Destination: 16 Length: 48
+Unable to read file "../map16/GHZ.bin" with compression Kosinski:
+Loading layout from file "../levels/ghz1.bin", using compression Uncompressed...
+System.AggregateException: One or more errors occurred. ---> System.IO.IOException: An attempt was made to move the position before the beginning of the stream.
+   at System.IO.MemoryStream.Seek(Int64 offset, SeekOrigin loc)
+   at SonicRetro.KensSharp.Kosinski.DecodeInternal(Stream source, Stream destination, Int64& decompressedBytes)
+   at SonicRetro.KensSharp.Kosinski.Decompress(Stream input, Stream output)
+   at SonicRetro.KensSharp.Kosinski.Decompress(String sourceFilePath)
+   at SonicRetro.SonLVL.API.Compression.Decompress(String file, CompressionType cmp) in E:\AutoBuild\SonLVL\SonLVLAPI\Compression.cs:line 51
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelBlocks() in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 511
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()
+   --- End of inner exception stack trace ---
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 164
+   at SonicRetro.SonLVL.GUI.MainForm.backgroundLevelLoader_DoWork(Object sender, DoWorkEventArgs e) in E:\AutoBuild\SonLVL\SonLVL\MainForm.cs:line 560
+---> (Inner Exception #0) System.IO.IOException: An attempt was made to move the position before the beginning of the stream.
+   at System.IO.MemoryStream.Seek(Int64 offset, SeekOrigin loc)
+   at SonicRetro.KensSharp.Kosinski.DecodeInternal(Stream source, Stream destination, Int64& decompressedBytes)
+   at SonicRetro.KensSharp.Kosinski.Decompress(Stream input, Stream output)
+   at SonicRetro.KensSharp.Kosinski.Decompress(String sourceFilePath)
+   at SonicRetro.SonLVL.API.Compression.Decompress(String file, CompressionType cmp) in E:\AutoBuild\SonLVL\SonLVLAPI\Compression.cs:line 51
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelBlocks() in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 511
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()<---
+
+---> (Inner Exception #1) System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at SonicRetro.SonLVL.API.S2.Layout.ReadLayout(Byte[] rawdata, LayoutData layout) in E:\AutoBuild\SonLVL\SonLVLAPI\S2\Layout.cs:line 7
+   at SonicRetro.SonLVL.API.LayoutFormatCombined.ReadLayout(String filename, CompressionType compression, LayoutData layout) in E:\AutoBuild\SonLVL\SonLVLAPI\LayoutFormat.cs:line 47
+   at SonicRetro.SonLVL.API.LayoutFormatCombined.TryReadLayout(String filename, CompressionType compression, LayoutData layout) in E:\AutoBuild\SonLVL\SonLVLAPI\LayoutFormat.cs:line 55
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelLayout(String levelname) in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 612
+   at SonicRetro.SonLVL.API.LevelData.<>c__DisplayClass68_0.<LoadLevel>b__0() in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 164
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()<---
+
+Loading Marble Zone Act 1...
+Loading palette file "../pallet/sonic.bin"...
+Source: 0 Destination: 0 Length: 16
+Loading palette file "../pallet/mz.bin"...
+Source: 0 Destination: 16 Length: 48
+Loading layout from file "../levels/mz1.bin", using compression Uncompressed...
+Loading 128x128 chunks from file "../map256/MZ.bin", using compression Kosinski...
+Loading 16x16 blocks from file "../map16/MZ.bin", using compression Kosinski...
+Loading 8x8 tiles from file "../artnem/8x8mz.bin", using compression Nemesis...
+Unable to read file "../map16/MZ.bin" with compression Kosinski:
+System.AggregateException: One or more errors occurred. ---> System.IO.IOException: An attempt was made to move the position before the beginning of the stream.
+   at System.IO.MemoryStream.Seek(Int64 offset, SeekOrigin loc)
+   at SonicRetro.KensSharp.Kosinski.DecodeInternal(Stream source, Stream destination, Int64& decompressedBytes)
+   at SonicRetro.KensSharp.Kosinski.Decompress(Stream input, Stream output)
+   at SonicRetro.KensSharp.Kosinski.Decompress(String sourceFilePath)
+   at SonicRetro.SonLVL.API.Compression.Decompress(String file, CompressionType cmp) in E:\AutoBuild\SonLVL\SonLVLAPI\Compression.cs:line 51
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelBlocks() in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 511
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()
+   --- End of inner exception stack trace ---
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 164
+   at SonicRetro.SonLVL.GUI.MainForm.backgroundLevelLoader_DoWork(Object sender, DoWorkEventArgs e) in E:\AutoBuild\SonLVL\SonLVL\MainForm.cs:line 560
+---> (Inner Exception #0) System.IO.IOException: An attempt was made to move the position before the beginning of the stream.
+   at System.IO.MemoryStream.Seek(Int64 offset, SeekOrigin loc)
+   at SonicRetro.KensSharp.Kosinski.DecodeInternal(Stream source, Stream destination, Int64& decompressedBytes)
+   at SonicRetro.KensSharp.Kosinski.Decompress(Stream input, Stream output)
+   at SonicRetro.KensSharp.Kosinski.Decompress(String sourceFilePath)
+   at SonicRetro.SonLVL.API.Compression.Decompress(String file, CompressionType cmp) in E:\AutoBuild\SonLVL\SonLVLAPI\Compression.cs:line 51
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelBlocks() in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 511
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()<---
+
+---> (Inner Exception #1) System.IndexOutOfRangeException: Index was outside the bounds of the array.
+   at SonicRetro.SonLVL.API.S2.Layout.ReadLayout(Byte[] rawdata, LayoutData layout) in E:\AutoBuild\SonLVL\SonLVLAPI\S2\Layout.cs:line 7
+   at SonicRetro.SonLVL.API.LayoutFormatCombined.ReadLayout(String filename, CompressionType compression, LayoutData layout) in E:\AutoBuild\SonLVL\SonLVLAPI\LayoutFormat.cs:line 47
+   at SonicRetro.SonLVL.API.LayoutFormatCombined.TryReadLayout(String filename, CompressionType compression, LayoutData layout) in E:\AutoBuild\SonLVL\SonLVLAPI\LayoutFormat.cs:line 55
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelLayout(String levelname) in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 612
+   at SonicRetro.SonLVL.API.LevelData.<>c__DisplayClass68_0.<LoadLevel>b__0() in E:\AutoBuild\SonLVL\SonLVLAPI\LevelData.cs:line 164
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()<---
+

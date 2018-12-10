@@ -1,0 +1,73 @@
+Opening INI file "C:\Users\DEVELOPER\Downloads\Source Code\SonLVL.ini"...
+Game type is S2.
+Opening INI file "C:\Users\DEVELOPER\Downloads\Source Code\Sonic 1 2005 INIs\SonLVL.ini"...
+Game type is S1.
+Loading Green Hill Zone Act 1...
+Loading 8x8 tiles from file "../artnem/8x8ghz1.bin", using compression Nemesis...
+Unable to read file "../artnem/8x8ghz1.bin" with compression Nemesis:
+SonicRetro.KensSharp.CompressionException: A bit code is already used as a prefix for other codes.
+   at SonicRetro.KensSharp.Nemesis.DecodingCodeTreeNode.SetCode(Byte code, Int32 length, NibbleRun nibbleRun) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.impl.cs:line 863
+   at SonicRetro.KensSharp.Nemesis.DecodeHeader(Stream input, Stream output, DecodingCodeTreeNode codeTree) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.impl.cs:line 638
+   at SonicRetro.KensSharp.Nemesis.Decode(Stream input, Stream output) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.impl.cs:line 620
+   at SonicRetro.KensSharp.Nemesis.Decompress(Stream input, Stream output) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.cs:line 66
+   at SonicRetro.KensSharp.Nemesis.Decompress(String sourceFilePath) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.cs:line 14
+   at SonicRetro.SonLVL.API.Compression.Decompress(String file, CompressionType cmp) in C:\Users\Mike\Documents\GitHub\SonLVL\SonLVLAPI\Compression.cs:line 42
+   at SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) in C:\Users\Mike\Documents\GitHub\SonLVL\SonLVLAPI\LevelData.cs:line 173
+   at SonicRetro.SonLVL.LevelConverter.MainForm.ConvertLevel() in C:\Users\Mike\Documents\GitHub\SonLVL\LevelConverter\MainForm.cs:line 134
+   at SonicRetro.SonLVL.LevelConverter.MainForm.button1_Click(Object sender, EventArgs e) in C:\Users\Mike\Documents\GitHub\SonLVL\LevelConverter\MainForm.cs:line 103
+   at System.Windows.Forms.Control.OnClick(EventArgs e)
+   at System.Windows.Forms.Button.OnClick(EventArgs e)
+   at System.Windows.Forms.Button.OnMouseUp(MouseEventArgs mevent)
+   at System.Windows.Forms.Control.WmMouseUp(Message& m, MouseButtons button, Int32 clicks)
+   at System.Windows.Forms.Control.WndProc(Message& m)
+   at System.Windows.Forms.ButtonBase.WndProc(Message& m)
+   at System.Windows.Forms.Button.WndProc(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.OnMessage(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.WndProc(Message& m)
+   at System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, Int32 msg, IntPtr wparam, IntPtr lparam)
+Loading Green Hill Zone Act 1...
+Loading 8x8 tiles from file "../artnem/8x8ghz1.bin", using compression Nemesis...
+Unable to read file "../artnem/8x8ghz1.bin" with compression Nemesis:
+SonicRetro.KensSharp.CompressionException: A bit code is already used as a prefix for other codes.
+   at SonicRetro.KensSharp.Nemesis.DecodingCodeTreeNode.SetCode(Byte code, Int32 length, NibbleRun nibbleRun) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.impl.cs:line 863
+   at SonicRetro.KensSharp.Nemesis.DecodeHeader(Stream input, Stream output, DecodingCodeTreeNode codeTree) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.impl.cs:line 638
+   at SonicRetro.KensSharp.Nemesis.Decode(Stream input, Stream output) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.impl.cs:line 620
+   at SonicRetro.KensSharp.Nemesis.Decompress(Stream input, Stream output) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.cs:line 66
+   at SonicRetro.KensSharp.Nemesis.Decompress(String sourceFilePath) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.cs:line 14
+   at SonicRetro.SonLVL.API.Compression.Decompress(String file, CompressionType cmp) in C:\Users\Mike\Documents\GitHub\SonLVL\SonLVLAPI\Compression.cs:line 42
+   at SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) in C:\Users\Mike\Documents\GitHub\SonLVL\SonLVLAPI\LevelData.cs:line 173
+   at SonicRetro.SonLVL.LevelConverter.MainForm.ConvertLevel() in C:\Users\Mike\Documents\GitHub\SonLVL\LevelConverter\MainForm.cs:line 134
+   at SonicRetro.SonLVL.LevelConverter.MainForm.button1_Click(Object sender, EventArgs e) in C:\Users\Mike\Documents\GitHub\SonLVL\LevelConverter\MainForm.cs:line 103
+   at System.Windows.Forms.Control.OnClick(EventArgs e)
+   at System.Windows.Forms.Button.OnClick(EventArgs e)
+   at System.Windows.Forms.Button.OnMouseUp(MouseEventArgs mevent)
+   at System.Windows.Forms.Control.WmMouseUp(Message& m, MouseButtons button, Int32 clicks)
+   at System.Windows.Forms.Control.WndProc(Message& m)
+   at System.Windows.Forms.ButtonBase.WndProc(Message& m)
+   at System.Windows.Forms.Button.WndProc(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.OnMessage(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.WndProc(Message& m)
+   at System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, Int32 msg, IntPtr wparam, IntPtr lparam)
+Loading Green Hill Zone Act 2...
+Loading 8x8 tiles from file "../artnem/8x8ghz1.bin", using compression Nemesis...
+Unable to read file "../artnem/8x8ghz1.bin" with compression Nemesis:
+SonicRetro.KensSharp.CompressionException: A bit code is already used as a prefix for other codes.
+   at SonicRetro.KensSharp.Nemesis.DecodingCodeTreeNode.SetCode(Byte code, Int32 length, NibbleRun nibbleRun) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.impl.cs:line 863
+   at SonicRetro.KensSharp.Nemesis.DecodeHeader(Stream input, Stream output, DecodingCodeTreeNode codeTree) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.impl.cs:line 638
+   at SonicRetro.KensSharp.Nemesis.Decode(Stream input, Stream output) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.impl.cs:line 620
+   at SonicRetro.KensSharp.Nemesis.Decompress(Stream input, Stream output) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.cs:line 66
+   at SonicRetro.KensSharp.Nemesis.Decompress(String sourceFilePath) in C:\Users\Mike\Documents\GitHub\kenssharp_git\Nemesis\Nemesis.cs:line 14
+   at SonicRetro.SonLVL.API.Compression.Decompress(String file, CompressionType cmp) in C:\Users\Mike\Documents\GitHub\SonLVL\SonLVLAPI\Compression.cs:line 42
+   at SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) in C:\Users\Mike\Documents\GitHub\SonLVL\SonLVLAPI\LevelData.cs:line 173
+   at SonicRetro.SonLVL.LevelConverter.MainForm.ConvertLevel() in C:\Users\Mike\Documents\GitHub\SonLVL\LevelConverter\MainForm.cs:line 134
+   at SonicRetro.SonLVL.LevelConverter.MainForm.button1_Click(Object sender, EventArgs e) in C:\Users\Mike\Documents\GitHub\SonLVL\LevelConverter\MainForm.cs:line 103
+   at System.Windows.Forms.Control.OnClick(EventArgs e)
+   at System.Windows.Forms.Button.OnClick(EventArgs e)
+   at System.Windows.Forms.Button.OnMouseUp(MouseEventArgs mevent)
+   at System.Windows.Forms.Control.WmMouseUp(Message& m, MouseButtons button, Int32 clicks)
+   at System.Windows.Forms.Control.WndProc(Message& m)
+   at System.Windows.Forms.ButtonBase.WndProc(Message& m)
+   at System.Windows.Forms.Button.WndProc(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.OnMessage(Message& m)
+   at System.Windows.Forms.Control.ControlNativeWindow.WndProc(Message& m)
+   at System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, Int32 msg, IntPtr wparam, IntPtr lparam)
