@@ -5547,24 +5547,24 @@ CopyrightText2:
 ; Music	playlist
 ; ---------------------------------------------------------------------------
 MusicList1:
-        dc.w  1, 2, 3, 1			; 0 - GHZ
-        dc.w  4, 5, 6, $C			; 1 - LZ
-        dc.w  $22, $22, $22, $22	; 2 - MZ
-        dc.w  $23, $23, $23, $23	; 3 - SLZ
-        dc.w  7, 8, 9, 7			; 4 - SYZ
-        dc.w  $A, $B, $D, $A		; 5 - SBZ
-        dc.w  $16, $16, $16, $16	; 6 - END
-        dc.w  $13, $13, $13, $13	; 7 - Cutscene
+        dc.b  1, 2, 3, 1			; 0 - GHZ
+        dc.b  4, 5, 6, $C			; 1 - LZ
+        dc.b  $22, $22, $22, $22	; 2 - MZ
+        dc.b  $23, $23, $23, $23	; 3 - SLZ
+        dc.b  7, 8, 9, 7			; 4 - SYZ
+        dc.b  $A, $B, $D, $A		; 5 - SBZ
+        dc.b  $16, $16, $16, $16	; 6 - END
+        dc.b  $13, $13, $13, $13	; 7 - Cutscene
 		even	
 MusicListAlt:
-        dc.w  1, 2, 3, 1			; 0 - GHZ
-        dc.w  4, 5, 6, $C			; 1 - LZ
-        dc.w  $22, $22, $22, $22	; 2 - MZ
-        dc.w  $23, $23, $23, $23	; 3 - SLZ
-        dc.w  7, $12, 9, 7			; 4 - SYZ
-        dc.w  $A, $B, $D,	$A		; 5 - SBZ
-        dc.w  $16, $16, $16, $16	; 6 - END
-        dc.w  $13, $13, $13, $13	; 7 - Cutscene
+        dc.b  1, 2, 3, 1			; 0 - GHZ
+        dc.b  4, 5, 6, $C			; 1 - LZ
+        dc.b  $22, $22, $22, $22	; 2 - MZ
+        dc.b  $23, $23, $23, $23	; 3 - SLZ
+        dc.b  7, $12, 9, 7			; 4 - SYZ
+        dc.b  $A, $B, $D,	$A		; 5 - SBZ
+        dc.b  $16, $16, $16, $16	; 6 - END
+        dc.b  $13, $13, $13, $13	; 7 - Cutscene
 		even
 ;SpecialStage_PlayList:	incbin	misc\speciallist.bin
 ;		even
@@ -5767,13 +5767,13 @@ Level_GetBGM:					  ; ...
 		move.w	($FFFFFE10).w,d0
 		ror.b	#2,d0
 		lsr.w	#6,d0
-		add.w	d0,d0
+;		add.w	d0,d0
 		lea	(MusicList1).l,a1	; load Music Playlist for Acts 1
 		tst.b	(Level_Music+5).w
 		beq.s	LevelBGM_ActAlt
 		lea	(MusicListAlt).l,a1	; load Music Playlist for Acts 1
 LevelBGM_ActAlt:
-		move.w	(a1,d0.w),d0	; add d0 to a1
+		move.b	(a1,d0.w),d0	; add d0 to a1
 		move.w	d0,(Level_Music).w	; store level music
 		bsr.w	PlaySound	; play music
 		move.b	#$34,(Object_RAM+next_object+next_object).w
