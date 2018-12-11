@@ -251,6 +251,38 @@ objoff_3F equ $3F
 ; property of all objects:
 object_size =           $40 ; the size of an object
 next_object =           object_size
+next_object2 =           object_size*2
+next_object3 =           object_size*3
+next_object4 =           object_size*4
+next_object5 =           object_size*5
+next_object6 =           object_size*6
+next_object7 =           object_size*7
+next_object8 =           object_size*8
+next_object9 =           object_size*9
+next_object10 =           object_size*10
+next_object11 =           object_size*11
+next_object12 =           object_size*12
+next_object13 =           object_size*13
+next_object14 =           object_size*14
+next_object15 =           object_size*15
+next_object16 =           object_size*16
+next_object17 =           object_size*17
+next_object18 =           object_size*18
+next_object19 =           object_size*19
+next_object20 =           object_size*20
+next_object21 =           object_size*21
+next_object22 =           object_size*22
+next_object23 =           object_size*23
+next_object24 =           object_size*24
+next_object25 =           object_size*25
+next_object26 =           object_size*26
+next_object27 =           object_size*27
+next_object28 =           object_size*28
+next_object29 =           object_size*29
+next_object30 =           object_size*30
+next_object31 =           object_size*31
+next_object32 =           object_size*32
+
 object_del_size_divided		equ	next_object/4
 object_del_size	equ	object_del_size_divided-1
 SRAM_access_flag =		$A130F1

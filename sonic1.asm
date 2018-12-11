@@ -1602,24 +1602,24 @@ SetTempo:
 ; Pause Game Module new beta pause code below
 ; -------------------------------------------------------------------------
 
-;obj_Pause = Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object
+;obj_Pause = Object_RAM+next_object8
 
 ;PauseGame:				; XREF: Level_MainLoop; et al
 ;	tst.b	$FFFFF605		; is Start button pressed?
 ;	bpl	NoPause			; if not, branch
 ;	cmpi.b	#6,$FFFFD024		; is Sonic dying?
 ;	bcc	NoPause			; if yes, branch
-;	tst.b	Object_RAM+next_object+next_object		; are Title Cards or Level Results being processed?
+;	tst.b	Object_RAM+next_object2		; are Title Cards or Level Results being processed?
 ;	bne	NoPause			; if yes, branch
 ;	tst.w	$FFFFD130 ; has title card sequence finished?
 ;	bne	NoPause	; if not, branch
-;	tst.w	Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object
+;	tst.w	Object_RAM+next_object23
 ;	bne	NoPause
 	; Prepare to pause the game
 ;	move.w	#1,($FFFFF63A).w	; freeze time
 ;	move.b	#1,($FFFFF003).w	; pause music
-;	move.b	Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object,obj_Pause+$1F		; ++ hide spin dust object
-;	sf.b	Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object
+;	move.b	Object_RAM+next_object12,obj_Pause+$1F		; ++ hide spin dust object
+;	sf.b	Object_RAM+next_object12
 
 	; Load Pause art
 ;	move.b	#$10,($FFFFF62A).w	; synchronize
@@ -1645,7 +1645,7 @@ SetTempo:
 ;	tst.b	$FFFFF605		; was Start pressed?
 ;	bpl.s	Pause_Loop		; if not, branch     
 
-;	move.b	obj_Pause+$1F,Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object	; ++ display spin dust object 
+;	move.b	obj_Pause+$1F,Object_RAM+next_object12	; ++ display spin dust object 
 	
 	; Kill "PAUSE" objecto
 ;	lea	obj_Pause,a0
@@ -1703,7 +1703,7 @@ SetTempo:
 ; Pause Game Module
 ; -------------------------------------------------------------------------
 
-obj_Pause = Object_RAM+next_object+next_object
+obj_Pause = Object_RAM+next_object2
 
 PauseGame:				; XREF: Level_MainLoop; et al
 		nop		
@@ -1718,14 +1718,14 @@ Pause_Main:
 	cmpi.b	#6,$FFFFD024		; is Sonic dying?
 	bcc	NoPause			; if yes, branch
 	if S2Obj34TitleCards = 1
-		tst.w	(Object_RAM+next_object+next_object+$30).w ; has title card sequence finished?
+		tst.w	(Object_RAM+next_object2+$30).w ; has title card sequence finished?
 	else	
 		tst.w	($FFFFD130).w ; has title card sequence finished?
 	endif	
 	bne	NoPause			; if yes, branch
-;	cmp.b	#$3A,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
+;	cmp.b	#$3A,(Object_RAM+next_object23).w
 ;	beq.w	NoPause
-	tst.w	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
+	tst.w	(Object_RAM+next_object23).w
 	bne.w	NoPause	
 	tst.b	(Life_Count).w
 	beq.w	NoPause
@@ -1736,8 +1736,8 @@ Pause_Main:
 		stopZ80
 		move.b	#1,($A01C10).l
 		move.w	#0,($A11100).l
-;	move.b	Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object,obj_Pause+$1F		; ++ hide spin dust object
-;	sf.b	Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object
+;	move.b	Object_RAM+next_object7,obj_Pause+$1F		; ++ hide spin dust object
+;	sf.b	Object_RAM+next_object7
 ;	jsr	DeleteStars
 	; Load Pause art
 	move.b	#$10,($FFFFF62A).w	; synchronize
@@ -1776,7 +1776,7 @@ Pause_ChkStartZ80NotStopped:
 		bne.s	Pause_ChkStartZ80NotStopped
 		move.b	#$80,($A01C10).l
 		move.w	#0,($A11100).l
-;	move.b	obj_Pause+$1F,Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object	; ++ display spin dust object 
+;	move.b	obj_Pause+$1F,Object_RAM+next_object7	; ++ display spin dust object 
 	
 	; Kill "PAUSE" objecto
 ;	lea	obj_Pause,a0
@@ -4557,7 +4557,7 @@ Title_ClrPallet:
 
 		moveq	#3,d0		; load Sonic's pallet
 		jsr	PalLoad1
-;		move.b	#$8A,(Object_RAM+next_object+next_object).w ; load "SONIC TEAM PRESENTS"	object
+;		move.b	#$8A,(Object_RAM+next_object2).w ; load "SONIC TEAM PRESENTS"	object
 		move.b	#0,(Level_started_flag).w
 		clr.w	($FFFFFFF4).w
 		jsr	Credits_MapLoad
@@ -4671,22 +4671,22 @@ Offset_0x003B1A:
 		move.b	#0,($FFFFFFFA).w; disable debug mode
 		clr.b	($FFFFFE2C).w
 		move.w	#$178,($FFFFFC20).w; run title	screen for $178	frames
-		lea	(Object_RAM+next_object+next_object).w,a1
+		lea	(Object_RAM+next_object2).w,a1
 		moveq	#0,d0
 		move.w	#7,d1
 
 ;Title_ClrObjRam2:
 	;	move.l	d0,(a1)+
 	;	dbf	d1,Title_ClrObjRam2
-		lea (Object_RAM+next_object+next_object).w,a1
+		lea (Object_RAM+next_object2).w,a1
 
 		jsr DeleteObject2 ;clear object RAM more thoroughly
 		move.b #$E,(Object_RAM+next_object).w ; load big Sonic object
-		move.b	#$F,(Object_RAM+next_object+next_object).w ; load "PRESS	START BUTTON" object
-		move.b	#$F,(Object_RAM+next_object+next_object+next_object).w ; load "TM" object
-		move.b	#3,($FFFFD0DA).w
-		move.b	#$F,(Object_RAM+next_object+next_object+next_object+next_object).w
-		move.b	#2,($FFFFD11A).w
+		move.b	#$F,(Object_RAM+next_object2).w ; load "PRESS	START BUTTON" object
+		move.b	#$F,(Object_RAM+next_object3).w ; load "TM" object
+		move.b	#3,(Object_RAM+next_object3+mapping_frame).w
+		move.b	#$F,(Object_RAM+next_object4).w
+		move.b	#2,(Object_RAM+next_object4+mapping_frame).w
 		jsr	ObjectsLoad
 		jsr	DeformBgLayer
 		jsr	BuildSprites
@@ -5262,7 +5262,7 @@ loc_3422:
 Demo_Level:
 		cmpi.w	#$1C,($FFFFF600).w	; is level number 0600 (special	stage)?
 		beq.s	Demo_Level_Credits	; if not, branch
-		move.b	#$F,(Object_RAM+next_object+next_object).w ; load "PRESS	START BUTTON" object
+		move.b	#$F,(Object_RAM+next_object2).w ; load "PRESS	START BUTTON" object
 Demo_Level_Credits:
 		move.b	#3,(Life_Count).w ; set lives to	3
 		moveq	#0,d0
@@ -5776,7 +5776,7 @@ LevelBGM_ActAlt:
 		move.b	(a1,d0.w),d0	; add d0 to a1
 		move.w	d0,(Level_Music).w	; store level music
 		bsr.w	PlaySound	; play music
-		move.b	#$34,(Object_RAM+next_object+next_object).w
+		move.b	#$34,(Object_RAM+next_object2).w
 
 Level_TtlCard:					  ; ...
 		move.b	#$C,($FFFFF62A).w
@@ -5784,8 +5784,8 @@ Level_TtlCard:					  ; ...
 		jsr	RunObjects
 		jsr	BuildSprites
 		bsr.w	RunPLC_RAM
-		move.w	($FFFFD088).w,d0
-		cmp.w	($FFFFD0B0).w,d0
+		move.w	(Object_RAM+next_object2+x_pos).w,d0
+		cmp.w	(Object_RAM+next_object2+$30).w,d0
 		bne.s	Level_TtlCard
 		tst.l	($FFFFF680).w
 		bne.s	Level_TtlCard
@@ -5826,10 +5826,10 @@ loc_303C0C:					  ; ...
 
 		tst.b	(Water_flag).w
 		beq.s	loc_303C82
-		move.b	#$1B,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load water	surface	object
-		move.w	#$60,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+x_pos).w
-		move.b	#$1B,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
-		move.w	#$120,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+x_pos).w
+		move.b	#$1B,(Object_RAM+next_object30).w ; load water	surface	object
+		move.w	#$60,(Object_RAM+next_object30+x_pos).w
+		move.b	#$1B,(Object_RAM+next_object31).w
+		move.w	#$120,(Object_RAM+next_object31+x_pos).w
 
 loc_303C82:					  ; ...
 ;		cmp.b	#$D,($FFFFFE10).w
@@ -5839,7 +5839,7 @@ loc_303C82:					  ; ...
 ;loc_303C90:					  ; ...
 ;		cmp.b	#$A,($FFFFFE10).w
 ;		bne.s	Level_ClearHUD
-;		move.b	#7,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
+;		move.b	#7,(Object_RAM+next_object30).w
 
 Level_ClearHUD:					  ; ...
 		moveq	#0,d0
@@ -5923,9 +5923,9 @@ loc_303DC0:					  ; ...
 		bsr.w	PalLoad4_Water
 
 loc_303DC4:					  ; ...
-		move.w	#-1,(Object_RAM+next_object+next_object+$3E).w
-		move.b	#$E,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+routine).w
-		move.w	#$A,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+$34).w
+		move.w	#-1,(Object_RAM+next_object2+$3E).w
+		move.b	#$E,(Object_RAM+next_object7+routine).w
+		move.w	#$A,(Object_RAM+next_object7+$34).w
 
 loc_303DD6:					  ; ...
 		move.b	#$C,($FFFFF62A).w
@@ -5933,9 +5933,9 @@ loc_303DD6:					  ; ...
 		jsr	RunObjects
 		jsr	BuildSprites
 		bsr.w	RunPLC_RAM
-		tst.b	(Object_RAM+next_object+next_object+next_object+next_object+next_object).w
+		tst.b	(Object_RAM+next_object5).w
 		bne.s	loc_303DD6
-		lea	(Object_RAM+next_object+next_object).w,a1
+		lea	(Object_RAM+next_object2).w,a1
 		move.b	#$16,$24(a1)
 		move.w	#$2D,$1E(a1)
 		move.b	#$16,$64(a1)
@@ -6286,8 +6286,8 @@ InitPlayers:
 	move.w	($FFFFFF74).w,d0
 	bne.s	InitPlayers_Alone ; branch if this isn't a Sonic and Tails game
 	move.b	#1,(MainCharacter).w ; load Obj01 Sonic object at Object_RAM
-	move.b	#5,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
-;	move.b	#8,(Object_RAM+next_object+next_object+next_object+next_object).w ; load Obj08 Sonic's spindash dust/splash object at Object_RAM+next_object+next_object+next_object+next_object
+	move.b	#5,(Object_RAM+next_object10).w
+;	move.b	#8,(Object_RAM+next_object4).w ; load Obj08 Sonic's spindash dust/splash object at Object_RAM+next_object4
 	;cmpi.b	#0,(Current_Zone).w
 	;beq.s	return_44BC ; skip loading Tails if this is SHZ
 	;cmpi.b	#6,(Current_Zone).w
@@ -6303,7 +6303,7 @@ InitPlayers:
 ;	move.w	(MainCharacter+y_pos).w,(Sidekick+y_pos).w
 ;	subi.w	#$20,(Sidekick+x_pos).w
 ;	addi.w	#4,(Sidekick+y_pos).w
-;	move.b	#8,(Tails_Dust).w ; load Obj08 Tails' spindash dust/splash object at Object_RAM+next_object+next_object+next_object+next_object+next_object
+;	move.b	#8,(Tails_Dust).w ; load Obj08 Tails' spindash dust/splash object at Object_RAM+next_object5
 
 return_44BC:
 	rts
@@ -6314,7 +6314,7 @@ InitPlayers_Alone: ; either Sonic or Tails but not both
 	bne.s	InitPlayers_TailsAlone ; branch if this is a Tails alone game
 
 	move.b	#1,(MainCharacter).w ; load Obj01 Sonic object at $FFFFB000
-;	move.b	#8,(Object_RAM+next_object+next_object+next_object+next_object).w ; load Obj08 Sonic's spindash dust/splash object at Object_RAM+next_object+next_object+next_object+next_object
+;	move.b	#8,(Object_RAM+next_object4).w ; load Obj08 Sonic's spindash dust/splash object at Object_RAM+next_object4
 	;cmpi.b	#0,(Current_Zone).w
 	;beq.s	return_44BC ; skip loading Tails if this is SHZ
 	;cmpi.b	#6,(Current_Zone).w
@@ -6330,7 +6330,7 @@ InitPlayers_Alone: ; either Sonic or Tails but not both
 ;	move.w	(MainCharacter+y_pos).w,(Sidekick+y_pos).w
 ;	subi.w	#$20,(Sidekick+x_pos).w
 ;	addi.w	#4,(Sidekick+y_pos).w
-;	move.b	#8,(Tails_Dust).w ; load Obj08 Tails' spindash dust/splash object at Object_RAM+next_object+next_object+next_object+next_object+next_object
+;	move.b	#8,(Tails_Dust).w ; load Obj08 Tails' spindash dust/splash object at Object_RAM+next_object5
 ;	rts
 ; ===========================================================================
 ; loc_44D0:
@@ -6340,7 +6340,7 @@ InitPlayers_TailsAlone:
 	beq.w	InitPlayers_MetalAlone
 ;	move.b	#2,(MainCharacter).w ; load Obj02 Tails object at $FFFFB000
 ;	move.w  #Tails_Tails,(Tails_Tails_ptr).w
-;	move.b	#8,(Tails_Dust).w ; load Obj08 Tails' spindash dust/splash object at Object_RAM+next_object+next_object+next_object+next_object
+;	move.b	#8,(Tails_Dust).w ; load Obj08 Tails' spindash dust/splash object at Object_RAM+next_object4
 ;	addi.w	#4,(MainCharacter+y_pos).w
 ;	clr.b	(Super_Sonic_flag).w
 ;	rts
@@ -6349,7 +6349,7 @@ InitPlayers_MetalAlone:
 ;	move.b	#$4E,(MainCharacter).w
 ;	move.w	(Player_option).w,d0
 ;	move.w	d0,(Player_Mode).w
-;	move.b	#8,(Object_RAM+next_object+next_object+next_object+next_object).w
+;	move.b	#8,(Object_RAM+next_object4).w
 ;	move.b	#$01,($FFFFFFE0).w
 	rts
 ; End of function InitPlayers
@@ -7298,7 +7298,7 @@ SS_ClrNemRam:
 		move.b	#$FF,(v_ssangleprev).w	; fill previous angle with obviously false value to force an update
 		move.b	#1,(f_timecount).w ; update time counter
 		move.b	#1,(f_scorecount).w ; update score counter
-		move.b	#$21,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load HUD object
+		move.b	#$21,(Object_RAM+next_object14).w ; load HUD object
 		jsr	Hud_Base_SS	; load basic HUD gfx
 		bsr.w	PalCycle_SS
 		clr.w	($FFFFF780).w	; set stage angle to "upright"
@@ -7343,7 +7343,7 @@ SS_MainLoop:
 		move.w	($FFFFF604).w,($FFFFF602).w
 		jsr	ObjectsLoad
 		jsr	BuildSprites
-		move.b	#$21,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
+		move.b	#$21,(Object_RAM+next_object14).w
 		jsr	SS_ShowLayout
 		bsr.w	SS_BGAnimate
 		tst.w	($FFFFFFF0).w	; is demo mode on?
@@ -7423,7 +7423,7 @@ SS_EndClrObjRam:
 ;		move.l	#PalToCRAM,($FFFFF112).w
 ;		move.w	#jmp,($FFFFF116).w	; machine code for jmp
 ;		move.l	#loc_B10,($FFFFF118).w
-		move.b	#$7E,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load results screen object
+		move.b	#$7E,(Object_RAM+next_object23).w ; load results screen object
 
 SS_NormalExit:
 		jsr	PauseGame
@@ -7777,10 +7777,10 @@ byte_4CCC:	dc.b 8,	2, 4, $FF, 2, 3, 8, $FF, 4, 2, 2, 3, 8,	$FD, 4,	2, 2, 3, 2, $
 ;		move.b	#$81,(Object_RAM).w ; load Sonic	object
 ;		move.b	#2,(Sidekick).w ; load Obj02 Tails object at $FFFFB040
 ;		move.b	#$80,(Object_RAM+next_object).w ; load continue screen objects
-;		move.b	#$80,(Object_RAM+next_object+next_object).w
+;		move.b	#$80,(Object_RAM+next_object2).w
 ;		move.b	#3,($FFFFD098).w
 ;		move.b	#4,($FFFFD09A).w
-;		move.b	#$80,(Object_RAM+next_object+next_object+next_object).w
+;		move.b	#$80,(Object_RAM+next_object3).w
 ;		move.b	#4,($FFFFD0E4).w
 ;		jsr	ObjectsLoad
 ;		jsr	BuildSprites
@@ -8110,7 +8110,7 @@ End_LoadSonic:
 		move.b	#1,($FFFFF7CC).w ; lock	controls
 		move.w	#$400,($FFFFF602).w ; move Sonic to the	left
 		move.w	#$F800,(MainCharacter+inertia).w ; set Sonic's speed
-;		move.b	#$21,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load HUD object
+;		move.b	#$21,(Object_RAM+next_object14).w ; load HUD object
 		jsr	ObjPosLoad
 		jsr	ObjectsLoad
 		jsr	BuildSprites
@@ -8299,7 +8299,7 @@ Obj87_MakeEmlds:			; XREF: Obj87_Index
 		bne.s	Obj87_Wait
 		addq.b	#2,$25(a0)
 		move.w	#1,$1C(a0)
-		move.b	#$88,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load chaos	emeralds objects
+		move.b	#$88,(Object_RAM+next_object16).w ; load chaos	emeralds objects
 
 Obj87_Wait:
 		rts	
@@ -8319,7 +8319,7 @@ locret_5480:
 Obj87_ClrObjRam:			; XREF: Obj87_Index
 		subq.w	#1,$30(a0)
 		bne.s	Obj87_Wait2
-		lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w,a1
+		lea	(Object_RAM+next_object16).w,a1
 		move.w	#$FF,d1
 
 Obj87_ClrLoop:
@@ -8340,7 +8340,7 @@ Obj87_MakeLogo:				; XREF: Obj87_Index
 		addq.b	#2,$25(a0)
 		move.w	#$B4,$30(a0)
 		move.b	#2,$1C(a0)
-		move.b	#$89,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load "SONIC THE HEDGEHOG" object
+		move.b	#$89,(Object_RAM+next_object16).w ; load "SONIC THE HEDGEHOG" object
 
 Obj87_Wait3:
 		rts	
@@ -8362,7 +8362,7 @@ Obj87_Leap:				; XREF: Obj87_Index
 		move.w	#$100,priority(a0)
 		move.b	#5,$1A(a0)
 		move.b	#2,$1C(a0)	; use "leaping"	animation
-		move.b	#$89,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load "SONIC THE HEDGEHOG" object
+		move.b	#$89,(Object_RAM+next_object16).w ; load "SONIC THE HEDGEHOG" object
 		bra.s	Obj87_Animate
 ; ===========================================================================
 
@@ -8552,7 +8552,7 @@ Cred_ClrPallet:
 
 		moveq	#3,d0
 		bsr.w	Jmpto_Palload1	; load Sonic's pallet
-;		move.b	#$8A,(Object_RAM+next_object+next_object).w ; load credits object
+;		move.b	#$8A,(Object_RAM+next_object2).w ; load credits object
 		jsr	Credits_MapLoad
 		jsr	ObjectsLoad
 		jsr	BuildSprites
@@ -8679,7 +8679,7 @@ TryAg_ClrPallet:
 		bsr.w	Jmpto_Palload1	; load ending pallet
 		clr.w	($FFFFFBC0).w
 		move.b	#0,(Level_started_flag).w
-		move.b	#$8B,(Object_RAM+next_object+next_object).w ; load Eggman object
+		move.b	#$8B,(Object_RAM+next_object2).w ; load Eggman object
 		jsr	ObjectsLoad
 		jsr	BuildSprites
 		move.w	#1800,($FFFFFC20).w ; show screen for 30 seconds
@@ -8734,9 +8734,9 @@ Obj8B_Main:				; XREF: Obj8B_Index
 		move.b	#2,$1C(a0)	; use "END" animation
 		cmpi.b	#7,($FFFFFE57).w ; do you have all 6 emeralds?
 		beq.s	Obj8B_Animate	; if yes, branch
-;		move.b	#$8A,(Object_RAM+next_object+next_object+next_object).w ; load credits object
+;		move.b	#$8A,(Object_RAM+next_object3).w ; load credits object
 		move.w	#9,($FFFFFFF4).w ; use "TRY AGAIN" text
-		move.b	#$8C,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load emeralds object on "TRY AGAIN" screen
+		move.b	#$8C,(Object_RAM+next_object32).w ; load emeralds object on "TRY AGAIN" screen
 		move.b	#0,$1C(a0)	; use "TRY AGAIN" animation
 
 Obj8B_Animate:				; XREF: Obj8B_Index
@@ -8752,7 +8752,7 @@ Obj8B_Juggle:				; XREF: Obj8B_Index
 		neg.w	d0
 
 loc_5A6A:
-		lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w,a1
+		lea	(Object_RAM+next_object32).w,a1
 		moveq	#5,d1
 
 loc_5A70:
@@ -12969,8 +12969,8 @@ MvSonic2:
 		sub.w	d2,8(a1)
 		btst	#0,status_secondary(a1)     ; does Sonic have a shield?
 		beq.s	locret_7B62       ; if not, branch
-		move.w	d0,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+$C).w   ; apply change to Shield's Y-Position
-		sub.w	d2,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+8).w   ; apply change to Shield's X-Position
+		move.w	d0,(Object_RAM+next_object12+$C).w   ; apply change to Shield's Y-Position
+		sub.w	d2,(Object_RAM+next_object12+8).w   ; apply change to Shield's X-Position
 locret_7B62:
 		rts	
 ; End of function MvSonicOnPtfm2
@@ -14079,7 +14079,7 @@ loc_8486:
 		subq.w	#1,d1
 	; We don't have to check whether it's the last one or not, it can't be unless there's not enough free ram to create more (and that's checked later).
 	; Here we begin what's replacing SingleObjLoad, in order to avoid resetting its d0 every time an object is created.
-		lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w,a1
+		lea	(Object_RAM+next_object32).w,a1
 		move.w	#$6F,d0
 
 loc_84AA:
@@ -14161,8 +14161,8 @@ loc_854E:
 
 		btst	#0,status_secondary(a1)    ; does Sonic have a shield?
 		beq.s	locret_856E       ; if not, branch
-		move.w	d0,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+$C).w   ; apply change to Shield's Y-Position
-		sub.w	d2,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+8).w   ; apply change to Shield's X-Position
+		move.w	d0,(Object_RAM+next_object12+$C).w   ; apply change to Shield's Y-Position
+		sub.w	d2,(Object_RAM+next_object12+8).w   ; apply change to Shield's X-Position
 locret_856E:
 		rts	
 ; End of function SlopeObject2
@@ -16570,8 +16570,8 @@ Obj2E_ChkShield:
 ;Obj2E_ChkShield_Cont:
 ;		addq.w	#1,(a2)
 		bset	#0,status_secondary(a1) ; give	Sonic a	shield
-		move.b	#2,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load shield object	($38)
-		move.w	a1,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+parent).w
+		move.b	#2,(Object_RAM+next_object12).w ; load shield object	($38)
+		move.w	a1,(Object_RAM+next_object12+parent).w
 		move.w	#$71,d0
 		jmp	(PlaySound_Special).l	; play shield sound
 ; ===========================================================================
@@ -16585,15 +16585,15 @@ Obj2E_ChkInvinc:
 
 		bset	#1,status_secondary(a1) ; make	Sonic invincible
 		move.b	#$96,invincibility_time(a1) ; time limit for the power-up
-		move.b	#$38,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load stars	object ($3801)
+		move.b	#$38,(Object_RAM+next_object17).w ; load stars	object ($3801)
 ;		move.b	#1,($FFFFD21C).w
-;		move.b	#$38,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load stars	object ($3802)
+;		move.b	#$38,(Object_RAM+next_object9).w ; load stars	object ($3802)
 ;		move.b	#2,($FFFFD25C).w
-;		move.b	#$38,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load stars	object ($3803)
+;		move.b	#$38,(Object_RAM+next_object17).w ; load stars	object ($3803)
 ;		move.b	#3,($FFFFD45C).w
-;		move.b	#$38,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load stars	object ($3804)
+;		move.b	#$38,(Object_RAM+next_object11).w ; load stars	object ($3804)
 ;		move.b	#4,($FFFFD2DC).w
-		move.w	a1,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+parent).w
+		move.w	a1,(Object_RAM+next_object17+parent).w
 		cmpi.b	#2,($FFFFF508).w
 		bgt.w	Obj2E_NoInvcMusic
 		add.b	#1,($FFFFF508).w
@@ -16696,7 +16696,7 @@ locsup:
 		move.w	#$C0,($FFFFF764).w
 		move.b	#$1F,anim(a1)
 		jsr	Super_and_Invincibility_Stars_Jmp
-		move.b	#$8E,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w	; load Obj7E (super sonic stars object) at Object_RAM+next_object
+		move.b	#$8E,(Object_RAM+next_object17).w	; load Obj7E (super sonic stars object) at Object_RAM+next_object
 ;	moveq	#$23,d0
 ;	jsr	(LoadPLC).l	; load Super Sonic's life counter patterns
 		cmpi.w	#2,($FFFFFFA0).w
@@ -18513,7 +18513,7 @@ Obj32_MZBlock:				; XREF: Obj32_Pressed
 		subq.w	#8,d3
 		move.w	#$20,d4
 		move.w	#$10,d5
-		lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w,a1 ; begin checking object RAM
+		lea	(Object_RAM+next_object32).w,a1 ; begin checking object RAM
 		move.w	#$5F,d6
 
 Obj32_MZLoop:
@@ -19029,7 +19029,7 @@ loc_13C6E:
 	lea	next_object(a1),a1 ; a1=object
 	dbf	d1,@obj34loop
 	
-	move.w	#$26,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+$34).w
+	move.w	#$26,(Object_RAM+next_object6+$34).w
 	clr.w	(Vscroll_Factor).w
 	move.w	#-$E0,($FFFFF61E).w
 
@@ -19229,8 +19229,8 @@ loc_13E42:
 	bpl.s	loc_13E54
 	move.b	#$10,-next_object+routine(a0)
 	clr.w	-next_object+objoff_34(a0)
-;	move.b	#$10,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+routine).w
-;	clr.w	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+objoff_34).w
+;	move.b	#$10,(Object_RAM+next_object7+routine).w
+;	clr.w	(Object_RAM+next_object7+objoff_34).w
 	bra.s	BranchTo9_DeleteObject
 ; ===========================================================================
 
@@ -19349,7 +19349,7 @@ BranchTo16_DisplaySprite
 
 loc_13F44:
 
-	cmpa.w	#Object_RAM+next_object+next_object,a0
+	cmpa.w	#Object_RAM+next_object2,a0
 	bne.s	BranchTo10_DeleteObject
 	moveq	#2,d0
 	jsr	(LoadPLC).l
@@ -19576,7 +19576,7 @@ Obj39_ChkPLC: 				; XREF: Obj39_Index
 		rts
 ; ===========================================================================
 Obj39_Main:
-        lea 	(Object_RAM+next_object+next_object+next_object).w,a1
+        lea 	(Object_RAM+next_object3).w,a1
    		move.b	#$39,(a1) ; load OVER object
 		move.w	#$855E,2(a1)
 		move.l	#Map_obj39,4(a1)
@@ -19674,7 +19674,7 @@ Obj3A_Main:
 		clr.b	(Maincharacter+speedshoes_time).w	; clear Super Shoes	;Mercury Constants
 ;		clr.w	($FFFFD032).w		; clear time limit of the invincibility
 ;		clr.w	($FFFFFE2C).w	; remove shield
-;		move.b	#$0,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object).w ; load shield object	($38)
+;		move.b	#$0,(Object_RAM+next_object6).w ; load shield object	($38)
 	;end Remove Speed Shoes At Signpost Fix
 ;		move.b	#$23,(MainCharacter+anim).w
 ;		clr.w	(MainCharacter+inertia).w
@@ -19734,7 +19734,7 @@ loc_C610:				; XREF: loc_C61A
 ; ===========================================================================
 
 loc_C61A:				; XREF: Obj3A_ChkPos
-		cmpi.b	#$E,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+routine).w
+		cmpi.b	#$E,(Object_RAM+next_object28+routine).w
 		beq.s	loc_C610
 		cmpi.b	#4,mapping_frame(a0)
 		bne.s	loc_C5FE
@@ -20017,7 +20017,7 @@ loc_C86C:				; XREF: Obj7E_ChkPos
 		bne.s	loc_C85A
 		addq.b	#2,routine(a0)
 		move.w	#180,anim_frame_duration(a0)	; set time delay to 3 seconds
-		move.b	#$7F,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load chaos	emerald	object
+		move.b	#$7F,(Object_RAM+next_object32).w ; load chaos	emerald	object
 
 Obj7E_Wait:				; XREF: Obj7E_Index
 		subq.w	#1,anim_frame_duration(a0)	; subtract 1 from time delay
@@ -20063,8 +20063,8 @@ Obj7E_Exit:				; XREF: Obj7E_Index
 ; ===========================================================================
 
 Obj7E_Continue:				; XREF: Obj7E_Index
-		move.b	#4,($FFFFD6DA).w
-		move.b	#$14,($FFFFD6E4).w
+		move.b	#4,(Object_RAM+next_object27+mapping_frame).w
+		move.b	#$14,(Object_RAM+next_object27+routine).w
 		move.w	#$AC,d0
 		jsr	(PlaySound_Special).l ;	play continues music
 		addq.b	#2,routine(a0)
@@ -20366,11 +20366,11 @@ return_15AC4:
 	if S2Obj34TitleCards = 1
 loc_15584:
 	lea	(VDP_data_port).l,a6
-	tst.w	(Object_RAM+next_object+next_object+layer).w
+	tst.w	(Object_RAM+next_object2+layer).w
 	bne.w	loc_15670
 	moveq	#$3F,d5
 	move.l	#$85DA85DA,d6
-	lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+$36).w,a0
+	lea	(Object_RAM+next_object5+$36).w,a0
 	moveq	#1,d7
 
 loc_155AE:
@@ -20388,12 +20388,12 @@ loc_155C0:
 loc_155C6:
 	dbf	d7,loc_155AE
 	moveq	#$26,d1
-	sub.w	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+$3A).w,d1
+	sub.w	(Object_RAM+next_object6+$3A).w,d1
 	lsr.w	#1,d1
 	subq.w	#1,d1
 	moveq	#7,d5
 	move.l	#$A5DCA5DC,d6
-	lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+$36).w,a0
+	lea	(Object_RAM+next_object6+$36).w,a0
 	moveq	#1,d7
 
 loc_155F0:
@@ -20415,11 +20415,11 @@ loc_15604:
 
 loc_15614:
 	dbf	d7,loc_155F0
-	move.w	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+$3A).w,d1
+	move.w	(Object_RAM+next_object7+$3A).w,d1
 	subq.w	#1,d1
 	moveq	#$D,d5
 	move.l	#$85D885D8,d6
-	lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+$36).w,a0
+	lea	(Object_RAM+next_object7+$36).w,a0
 	moveq	#1,d7
 	move.w	#$8F80,4(a6)
 
@@ -20451,7 +20451,7 @@ loc_15670:
 	moveq	#3,d4
 	move.l	#$85DA85DA,d5
 	move.l	#$A5DCA5DC,d6
-	lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+$36).w,a0
+	lea	(Object_RAM+next_object7+$36).w,a0
 	moveq	#1,d7
 	move.w	#$8F80,4(a6)
 
@@ -20482,7 +20482,7 @@ loc_156CE:
 	moveq	#7,d5
 	move.l	#$85DA85DA,d6
 
-	lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+$36).w,a0
+	lea	(Object_RAM+next_object6+$36).w,a0
 	moveq	#1,d7
 
 loc_156F4:
@@ -20500,14 +20500,14 @@ loc_156F4:
 
 loc_15714:
 	dbf	d7,loc_156F4
-	move.w	(Object_RAM+next_object+next_object+next_object+next_object+next_object+$36).w,d4
+	move.w	(Object_RAM+next_object5+$36).w,d4
 	beq.s	loc_1578C
 	lea	4(a6),a5
 
 	lea	(Camera_X_pos).w,a3
 	movea.l	($FFFFA400).w,a4
 	move.w	#$4000,d2
-	move.w	(Object_RAM+next_object+next_object+next_object+next_object+next_object+$36).w,d4
+	move.w	(Object_RAM+next_object5+$36).w,d4
 	moveq	#1,d6
 
 @loc_loop4	movem.l	d4-d6,-(sp)
@@ -20523,7 +20523,7 @@ loc_15714:
 	dbf	d6,@loc_loop4
 
 loc_1578C:
-	clr.w	(Object_RAM+next_object+next_object+next_object+next_object+next_object+$36).w
+	clr.w	(Object_RAM+next_object5+$36).w
 	rts
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
@@ -21358,7 +21358,7 @@ loc_D646:
 
 Super_and_Invincibility_Stars:
 ;		move.l	a0,-(sp)
-;		lea		(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w,a0	; stars object ($3801 and $8F)
+;		lea		(Object_RAM+next_object17).w,a0	; stars object ($3801 and $8F)
 ;		jsr		DeleteObject		; delete stars
 ;		move.b	#0,($FFFFD2DC).w
 		bclr	#2,(Maincharacter+status_secondary).w ; clear speed shoes
@@ -21369,12 +21369,12 @@ LoadPauseMenuArt:
 	tst.w	(Game_paused).w	; is the game paused?
 	beq.s	LoadPauseMenuArt_rts	; if not, branch
 	if S2Obj34TitleCards = 1
-	tst.w	(Object_RAM+next_object+next_object+$30).w ; has title card sequence finished?
+	tst.w	(Object_RAM+next_object2+$30).w ; has title card sequence finished?
 	else
 	tst.w	($FFFFD130).w ; has title card sequence finished?
 	endif
 	bne.w	LoadPauseMenuArt_rts	; if not, branch
-	tst.w	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
+	tst.w	(Object_RAM+next_object23).w
 	bne.w	LoadPauseMenuArt_rts
 	movem.l d0-a6,-(sp)
 	moveq   #0,d0
@@ -22798,7 +22798,7 @@ LoadObj:
 
 FindFreeObj:
 SingleObjLoad:
-		lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w,a1 ; start address for object RAM
+		lea	(Object_RAM+next_object32).w,a1 ; start address for object RAM
 		move.w	#$5F,d0
 		bra.s	SingleObjLoad2_
 ; End of function SingleObjLoad
@@ -25048,7 +25048,7 @@ loc_EC86:
 
 
 GotThroughAct:				; XREF: Obj3E_EndAct
-		tst.b	(v_objspace+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
+		tst.b	(v_objspace+next_object23).w
 		bne.s	locret_ECEE
 ;		tst.b	($FFFFFE2C).w
 ;		beq.w   GotThroughAct_2
@@ -25058,7 +25058,7 @@ GotThroughAct:				; XREF: Obj3E_EndAct
 		clr.b	(MainCharacter+status_secondary).w	; disable shield and invincibility ($FFFFFE2C-$FFFFFE2F)
 		clr.b	(f_timecount).w	; stop time counter
 ;		clr.b	($FFFFFE2E).w
-		move.b	#$3A,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
+		move.b	#$3A,(Object_RAM+next_object23).w
 		moveq	#$10,d0
 		jsr	(NewPLC).l	; load title card patterns
 		move.b	#1,(f_endactbonus).w
@@ -31341,16 +31341,16 @@ Obj01_InWater:
 		bne.s	locret_12D80
 		movea.l	a0,a1
 		bsr.w	ResumeMusic
-		move.b	#$A,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load bubbles object	from Sonic's mouth
-		move.b	#$81,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+subtype).w
-		move.l	a0,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+$3C).w
+		move.b	#$A,(Object_RAM+next_object13).w ; load bubbles object	from Sonic's mouth
+		move.b	#$81,(Object_RAM+next_object13+subtype).w
+		move.l	a0,(Object_RAM+next_object13+$3C).w
 		lea	(Sonic_top_speed).w,a2	; Load Sonic_top_speed into a2
 		bsr.w	ApplySpeedSettings	; Fetch Speed settings
 		asr	$10(a0)
 		asr	$12(a0)
 		asr	$12(a0)
 		beq.s	locret_12D80
-		move.w	#$100,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+anim).w	; splash animation
+		move.w	#$100,(Object_RAM+next_object10+anim).w	; splash animation
 		move.w	#$39,d0
 		jmp	(PlaySound_Special).l ;	play splash sound
 ; ===========================================================================
@@ -31368,7 +31368,7 @@ Obj01_OutWater:
 Sonic_OutWater2:
 		tst.w	y_vel(a0)
 		beq.w	locret_12D80
-		move.w	#$100,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+anim).w	; splash animation
+		move.w	#$100,(Object_RAM+next_object10+anim).w	; splash animation
 		move.l	a0,a1
 		bsr.w	ResumeMusic
 		cmpi.w	#-$1000,$12(a0)
@@ -31871,8 +31871,8 @@ loc_130BA:
 ;		beq.w	locret_130E8
 ;		tst.w	($FFFFF63A).w	; is the game paused?
 ;		bne.s	locret_130E8	; if yes, branch
-		move.b	#6,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+routine).w	; ??? $D11C only seems
-		move.b	#$15,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+mapping_frame).w
+		move.b	#6,(Object_RAM+next_object10+routine).w	; ??? $D11C only seems
+		move.b	#$15,(Object_RAM+next_object10+mapping_frame).w
 locret_130E8:
 		rts	
 ; End of function Sonic_MoveLeft
@@ -31925,8 +31925,8 @@ loc_13120:
 ;		beq.w	locret_1314E
 ;		tst.w	($FFFFF63A).w	; is the game paused?
 ;		bne.s	locret_1314E	; if yes, branch
-		move.b	#6,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+routine).w	; ??? $D11C only seems
-		move.b	#$15,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+mapping_frame).w
+		move.b	#6,(Object_RAM+next_object10+routine).w	; ??? $D11C only seems
+		move.b	#$15,(Object_RAM+next_object10+mapping_frame).w
 locret_1314E:
 		rts	
 ; End of function Sonic_MoveRight
@@ -32394,7 +32394,7 @@ Sonic_Homingattack:
 		andi.b	#$70,d1				; is A, B or C pressed?
 		beq.w	Sonic_HA_rts		; if not, branch
 
-		lea		(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w,a1	; start at the first level object RAM
+		lea		(Object_RAM+next_object32).w,a1	; start at the first level object RAM
 
 ; ---------------------------------------------------------------------------
 
@@ -32680,7 +32680,7 @@ Sonic_CheckGoSuper:
 	bset	#1,status_secondary(a0)	; make Sonic invincible
 	lea	(Sonic_top_speed).w,a2	; Load Sonic_top_speed into a2
 	bsr.w	ApplySpeedSettings	; Fetch Speed settings
-	move.b	#$8E,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w	; load Obj7E (super sonic stars object) at Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object
+	move.b	#$8E,(Object_RAM+next_object17).w	; load Obj7E (super sonic stars object) at Object_RAM+next_object10
 ;	moveq	#$26,d0
 ;	jsr	(LoadPLC).l	; load Super Sonic's life counter patterns
 ;	moveq	#$23,d0
@@ -32837,7 +32837,7 @@ Sonic_Spindash:
 	move.b	#1,$39(a0)		; set spindash flag
 	move.w	#0,$3A(a0)		; set charge count to 0
 	cmpi.b	#$C,subtype(a0)		; ??? oxygen remaining?
-	move.b	#2,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+anim).w	; ??? $D11C only seems
+	move.b	#2,(Object_RAM+next_object10+anim).w	; ??? $D11C only seems
 						; to be used in spindash 
 loc2_1AC84:
 	jsr	Sonic_LevelBound
@@ -32877,7 +32877,7 @@ loc2_1AC8E:
 	neg.w	inertia(a0)
 @spindashcont2:
 	bset	#2,status(a0)
-	move.b	#0,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+anim).w
+	move.b	#0,(Object_RAM+next_object10+anim).w
 	move.w	#$B6,d0	; spindash zoom sound
 	jsr	(PlaySound).l
 	bra.s	Obj01_Spindash_ResetScr
@@ -33542,8 +33542,8 @@ GameOver:				; XREF: Obj01_Death
 
 @skipsub:
 		move.w	#0,$3A(a0)
-		move.b	#$39,(Object_RAM+next_object+next_object).w ; load GAME object
-;		move.b	#$39,(Object_RAM+next_object+next_object+next_object).w ; load OVER object
+		move.b	#$39,(Object_RAM+next_object2).w ; load GAME object
+;		move.b	#$39,(Object_RAM+next_object3).w ; load OVER object
 ;		move.b	#1,($FFFFD0DA).w ; set OVER object to correct frame
 		clr.b	($FFFFFE1A).w
 
@@ -33559,8 +33559,8 @@ loc_138D4:
 		tst.b	($FFFFFE1A).w	; is TIME OVER tag set?
 		beq.s	locret_13900	; if not, branch
 		move.w	#0,$3A(a0)
-		move.b	#$39,(Object_RAM+next_object+next_object).w ; load TIME object
-		move.b	#$39,(Object_RAM+next_object+next_object+next_object).w ; load OVER object
+		move.b	#$39,(Object_RAM+next_object2).w ; load TIME object
+		move.b	#$39,(Object_RAM+next_object3).w ; load OVER object
 		move.b	#2,($FFFFD09A).w
 		move.b	#3,($FFFFD0DA).w
 		bra.s	loc_138C2
@@ -35705,7 +35705,7 @@ ChangeShieldFrame:
 	bne.w	ChangeShieldFrame_rts		; if yes, branch
 	movem.l d0-a6,-(sp)
 	moveq   #0,d0
-	move.b  (Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+mapping_frame).w,d0
+	move.b  (Object_RAM+next_object12+mapping_frame).w,d0
 	add.w   d0,d0
 	lea     (ShieldSizes).l,a2
 	move.w  (a2,d0.w),d4
@@ -35728,7 +35728,7 @@ ChangeStarFrame:
 	beq.s	ChangeStarFrame_rts
 	movem.l d0-a6,-(sp)
 	moveq   #0,d0
-	move.b  (Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+mapping_frame).w,d0
+	move.b  (Object_RAM+next_object17+mapping_frame).w,d0
 	add.w   d0,d0
 	lea     (StarSizes).l,a2
 	move.w  (a2,d0.w),d4
@@ -44894,7 +44894,7 @@ TouchResponse:				; XREF: Obj01
 Touch_NoDuck:
 		move.w	#$10,d4
 		add.w	d5,d5
-		lea	(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w,a1 ; begin checking the object RAM
+		lea	(Object_RAM+next_object32).w,a1 ; begin checking the object RAM
 		move.w	#$5F,d6
 
 Touch_Loop:
@@ -47614,7 +47614,7 @@ RedCounterFrame:
 ; ---------------------------------------------------------------------------
 
 Obj21:					; XREF: Obj_Index
-		cmpi.b	#$3A,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w	; is the level finished?
+		cmpi.b	#$3A,(Object_RAM+next_object23).w	; is the level finished?
 		bne.s	Obj21_HUD	; if not, branch
 		jmp		DeleteObject
 Obj21_HUD:
@@ -47701,7 +47701,7 @@ Map_obj21SS:
 BuildHUD:
 	tst.b	(Level_started_flag).w
 	beq.w	return_40858
-	cmp.b	#$3A,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w
+	cmp.b	#$3A,(Object_RAM+next_object23).w
 	beq.w	return_40858
 	cmpi.b	#7,($FFFFFE10).w ; check if level is in the new zones
 	beq.w	return_40858
@@ -50457,9 +50457,9 @@ TA_LoadPal:
 ;		move.w	d0,(TA_Music).w	; store level music
 ;		bsr.w	PlaySound	; play music
 ;		if S2Obj34TitleCards = 1
-;		move.b	#$34,(Object_RAM+next_object+next_object).w ; load Obj34 (level title card) at $FFFFB080 ; load Obj34 (level title card) at $FFFFB080
+;		move.b	#$34,(Object_RAM+next_object2).w ; load Obj34 (level title card) at $FFFFB080 ; load Obj34 (level title card) at $FFFFB080
 ;		else
-;		move.b	#$34,(Object_RAM+next_object+next_object).w ; load title	card object
+;		move.b	#$34,(Object_RAM+next_object2).w ; load title	card object
 ;		endc
 ; TA_40DA:
 TA_TtlCard:
@@ -50481,7 +50481,7 @@ TA_TtlCard:
 ;		move.w	($FFFFD108).w,d0
 ;		cmp.w	($FFFFD130).w,d0 ; has title card sequence finished?
 ;		bne.s	TA_TtlCard	; if not, branch
-;		move.b	#$12,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+$30).w
+;		move.b	#$12,(Object_RAM+next_object7+$30).w
 ;		tst.l	($FFFFF680).w	; are there any	items in the pattern load cue?
 ;		bne.s	TA_TtlCard	; if yes, branch
 ;	endc
@@ -50528,10 +50528,10 @@ TA_TtlCard:
 ;		move.b	#0,(TA_started_flag).w
 ;		cmpi.b	#1,($FFFFFE10).w ; is level LZ?
 ;		bne.s	TA_LoadObj	; if not, branch
-;		move.b	#$1B,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load water	surface	object
-;		move.w	#$60,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+x_pos).w
+;		move.b	#$1B,(Object_RAM+next_object30).w ; load water	surface	object
+;		move.w	#$60,(Object_RAM+next_object30+x_pos).w
 ;		move.b	#$1B,($FFFFD7C0).w
-;		move.w	#$120,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+x_pos).w
+;		move.w	#$120,(Object_RAM+next_object31+x_pos).w
 
 ;TA_LoadObj:
 ;		jsr	ObjPosLoad
@@ -50623,9 +50623,9 @@ TA_DelayLoop:
 ;		tst.w	($FFFFFFF0).w
 ;		bmi.s	TA_ClrCardArt
 ;		if S2Obj34TitleCards=1
-;		move.w	#-1,(Object_RAM+next_object+next_object+$3E).w
-;		move.b	#$E,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+routine).w
-;		move.w	#$A,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+$34).w
+;		move.w	#-1,(Object_RAM+next_object2+$3E).w
+;		move.b	#$E,(Object_RAM+next_object7+routine).w
+;		move.w	#$A,(Object_RAM+next_object7+$34).w
 
 ;TA_303DD6:					  ; ...
 ;		move.b	#$C,($FFFFF62A).w
@@ -50633,9 +50633,9 @@ TA_DelayLoop:
 ;		jsr	RunObjects
 ;		jsr	BuildSprites
 ;		bsr.w	RunPLC_RAM
-;		tst.b	(Object_RAM+next_object+next_object+next_object+next_object+next_object).w
+;		tst.b	(Object_RAM+next_object5).w
 ;		bne.s	TA_303DD6
-;		lea	(Object_RAM+next_object+next_object).w,a1
+;		lea	(Object_RAM+next_object2).w,a1
 ;		move.b	#$16,$24(a1)
 ;		move.w	#$2D,$1E(a1)
 ;		move.b	#$16,$64(a1)
@@ -50667,7 +50667,7 @@ TA_StartGame:
 ;		move.b	#1,(f_timecount).w ; update time counter
 ;	endc	;end HUD Centiseconds
 ;	move.b	#1,($FFFFFE2C).w
-;		move.b	#$21,(Object_RAM+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object+next_object).w ; load HUD object
+;		move.b	#$21,(Object_RAM+next_object14).w ; load HUD object
 ;		bclr	#7,($FFFFF600).w ; subtract 80 from screen mode
 	;	move.b   #1,($FFFFFE1E).w   ; update time counter
 
