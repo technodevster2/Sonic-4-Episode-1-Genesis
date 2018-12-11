@@ -152,8 +152,8 @@ ZONE_FZ                         equ     $0502
 
 CamX                            equ     $FFFFF700
 CamY                            equ     $FFFFF704
-SonX                            equ     $FFFFD008
-SonY                            equ     $FFFFD00C
+SonX                            equ     MainCharacter+x_pos
+SonY                            equ     MainCharacter+y_pos
 
 palcheck                        equ     $FFFFFFBE
 MusicChk                        equ     $FFFFFFEA
@@ -1607,7 +1607,7 @@ SetTempo:
 ;PauseGame:				; XREF: Level_MainLoop; et al
 ;	tst.b	$FFFFF605		; is Start button pressed?
 ;	bpl	NoPause			; if not, branch
-;	cmpi.b	#6,$FFFFD024		; is Sonic dying?
+;	cmpi.b	#6,MainCharacter+routine		; is Sonic dying?
 ;	bcc	NoPause			; if yes, branch
 ;	tst.b	Object_RAM+next_object2		; are Title Cards or Level Results being processed?
 ;	bne	NoPause			; if yes, branch
@@ -1654,7 +1654,7 @@ SetTempo:
 ;	jsr	objectsload2
 ;	tst.w	($FFFFFE08).w
 ;	bne.s	@0
-;	cmpi.b	#6,($FFFFD024).w
+;	cmpi.b	#6,(MainCharacter+routine).w
 ;	bcc.s	@1
 ;@0	jsr	DeformBgLayer
 ;@1
@@ -1715,12 +1715,12 @@ PauseGame:				; XREF: Level_MainLoop; et al
 Pause_Main:
 	tst.b	$FFFFF605		; is Start button pressed?
 	bpl	NoPause			; if not, branch
-	cmpi.b	#6,$FFFFD024		; is Sonic dying?
+	cmpi.b	#6,MainCharacter+routine		; is Sonic dying?
 	bcc	NoPause			; if yes, branch
 	if S2Obj34TitleCards = 1
 		tst.w	(Object_RAM+next_object2+$30).w ; has title card sequence finished?
 	else	
-		tst.w	($FFFFD130).w ; has title card sequence finished?
+		tst.w	(Object_RAM+next_object4+$30).w ; has title card sequence finished?
 	endif	
 	bne	NoPause			; if yes, branch
 ;	cmp.b	#$3A,(Object_RAM+next_object23).w
@@ -1790,7 +1790,7 @@ Pause_ChkStartZ80NotStopped:
 Skip_Title_Screen:
 	tst.w	($FFFFFE08).w
 	bne.s	@0
-	cmpi.b	#6,($FFFFD024).w
+	cmpi.b	#6,(MainCharacter+routine).w
 	bcc.s	@1
 @0	jsr	DeformBgLayer
 @1
@@ -4601,7 +4601,7 @@ Title_LoadText:
 		jsr	LevelSizeLoad
 		jsr	DeformBgLayer
 		jsr	DynamicEvents
-		lea	($FFFFB000).w,a1
+		lea	(Block_Table).w,a1
 
 		lea	(Blk16_Title).l,a0  ; load GHZ 16x16 mappings
 		bsr.w	KosDec            ; use Kosinski decompressor instead of Enigma decompresor
@@ -4666,7 +4666,7 @@ Offset_0x003B1A:
 		move.b	#$11,d0; play title screen music
 		bsr.w	PlaySound
 		move.b	($20002D).l,($FFFFFF8C).w ; load unlocked level select if game is beaten
-		move.w	#$0,($FFFFD00C).w
+		move.w	#$0,(MainCharacter+y_pos).w
 		move.w	#$0,($FFFFF704).w
 		move.b	#0,($FFFFFFFA).w; disable debug mode
 		clr.b	($FFFFFE2C).w
@@ -4718,7 +4718,7 @@ loc_317C:
 		jsr	PalCycle_Title
 	endc	;end Title Screen Palette Fix
 		jsr	RunPLC_RAM
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		addq.w	#2,d0
 		cmpi.w	#$FF00,d0	; has Sonic object passed x-position $FF00?
 		bcs.s	Title_ChkRegion	; if not, branch
@@ -4791,7 +4791,7 @@ Title_ChkLevSel:
 ;		btst	#6,($FFFFF604).w ; check if A is pressed
 ;		beq.w	PlayLevel	; if not, play level
 
-		cmp.b	#6,($FFFFD0A4).w	; is Title Menu on?
+		cmp.b	#6,(Object_RAM+next_object2+routine).w	; is Title Menu on?
 		beq.w	loc_317C			; if it not was deleted, branch	
 		moveq	#0,d2
 		move.b	(Title_screen_option).w,d2	; load the choice
@@ -5224,9 +5224,9 @@ loc_33B6:				; XREF: loc_33E4
 		jsr	DynamicEvents
 		jsr	PalCycle_Load
 		jsr	RunPLC_RAM
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		addq.w	#2,d0
-		move.w	d0,($FFFFD008).w
+		move.w	d0,(MainCharacter+x_pos).w
 		cmpi.w	#$1C00,d0
 		bcs.s	loc_33E4
 		move.b	#0,($FFFFF600).w ; set screen mode to 00 (level)
@@ -6365,7 +6365,7 @@ LZWaterEffects:				; XREF: Level
 		beq.s	locret_3C28
 		tst.b	($FFFFF744).w
 		bne.s	LZMoveWater
-		cmpi.b	#6,($FFFFD024).w
+		cmpi.b	#6,(MainCharacter+routine).w
 		bcc.s	LZMoveWater
 		jsr	LZWindTunnels
 		jsr	LZWaterSlides
@@ -6487,7 +6487,7 @@ DynWater_LZ1:				; XREF: DynWater_Index
 		cmpi.w	#$600,d0
 		bcs.s	loc_3CB4
 		move.w	#$108,d1
-		cmpi.w	#$200,($FFFFD00C).w
+		cmpi.w	#$200,(MainCharacter+y_pos).w
 		bcs.s	loc_3CBA
 		cmpi.w	#$C00,d0
 		bcs.s	loc_3CB4
@@ -6521,7 +6521,7 @@ loc_3CBA:				; XREF: DynWater_LZ1
 loc_3CD0:				; XREF: DynWater_LZ1
 		subq.b	#1,d2
 		bne.s	locret_3CF4
-		cmpi.w	#$2E0,($FFFFD00C).w
+		cmpi.w	#$2E0,(MainCharacter+y_pos).w
 		bcc.s	locret_3CF4
 		move.w	#$3A8,d1
 		cmpi.w	#$1300,d0
@@ -6558,9 +6558,9 @@ DynWater_LZ3:				; XREF: DynWater_Index
 		move.w	#$900,d1
 		cmpi.w	#$600,d0
 		bcs.s	loc_3D54
-		cmpi.w	#$3C0,($FFFFD00C).w
+		cmpi.w	#$3C0,(MainCharacter+y_pos).w
 		bcs.s	loc_3D54
-		cmpi.w	#$600,($FFFFD00C).w
+		cmpi.w	#$600,(MainCharacter+y_pos).w
 		bcc.s	loc_3D54
 		move.w	#$4C8,d1
 		move.b	#$4B,($FFFFA506).w ; change level layout
@@ -6585,9 +6585,9 @@ loc_3D5E:				; XREF: DynWater_LZ3
 		bcs.s	loc_3DA2
 		cmpi.w	#$508,($FFFFF64A).w
 		beq.s	loc_3D8E
-		cmpi.w	#$600,($FFFFD00C).w
+		cmpi.w	#$600,(MainCharacter+y_pos).w
 		bcc.s	loc_3D8E
-		cmpi.w	#$280,($FFFFD00C).w
+		cmpi.w	#$280,(MainCharacter+y_pos).w
 		bcc.s	loc_3DA2
 
 loc_3D8E:
@@ -7012,7 +7012,7 @@ Osc_Data:	dc.w $7C, $80		; baseline values
 
 
 OscillateNumDo:				; XREF: Level
-		cmpi.b	#6,($FFFFD024).w
+		cmpi.b	#6,(MainCharacter+routine).w
 		bcc.s	locret_41C4
 		lea	($FFFFFE5E).w,a1
 		lea	(Osc_Data2).l,a2
@@ -7080,7 +7080,7 @@ Osc_Data2:	dc.w 2,	$10		; XREF: OscillateNumDo
 
 
 ChangeRingFrame:			; XREF: Level
-		cmpi.b	#6,($FFFFD024).w	; is Sonic dying?
+		cmpi.b	#6,(MainCharacter+routine).w	; is Sonic dying?
 		bcc.w	locret_4272		; if yes, branch
 		subq.b	#1,($FFFFFEC0).w
 		bpl.s	loc_421C
@@ -7145,7 +7145,7 @@ RingSizes:
 	dc.w	$40
 	if DebuggingFeatures = 1
 ChangeRingFrame_Debug:
-	cmpi.w	#$27B2,($FFFFD002).w
+	cmpi.w	#$27B2,(MainCharacter+art_tile).w
 	bne.s	NotARing
 	movem.l d0-a6,-(sp)
 	move.b  ($FFFFFEC3).w,(MainCharacter+mapping_frame).w
@@ -7796,7 +7796,7 @@ byte_4CCC:	dc.b 8,	2, 4, $FF, 2, 3, 8, $FF, 4, 2, 2, 3, 8,	$FD, 4,	2, 2, 3, 2, $
 ;Cont_MainLoop:
 ;		move.b	#$16,($FFFFF62A).w
 ;		bsr.w	Wait_VSync
-;		cmpi.b	#6,($FFFFD024).w
+;		cmpi.b	#6,(MainCharacter+routine).w
 ;		bcc.s	loc_4DF2
 ;		disable_ints
 ;		move.w	($FFFFFC20).w,d1
@@ -7808,9 +7808,9 @@ byte_4CCC:	dc.b 8,	2, 4, $FF, 2, 3, 8, $FF, 4, 2, 2, 3, 8,	$FD, 4,	2, 2, 3, 2, $
 ;loc_4DF2:
 ;		jsr	ObjectsLoad
 ;		jsr	BuildSprites
-;		cmpi.w	#$180,($FFFFD008).w ; has Sonic	run off	screen?
+;		cmpi.w	#$180,(MainCharacter+x_pos).w ; has Sonic	run off	screen?
 ;		bcc.s	Cont_GotoLevel	; if yes, branch
-;		cmpi.b	#6,($FFFFD024).w
+;		cmpi.b	#6,(MainCharacter+routine).w
 ;		bcc.s	Cont_MainLoop
 ;		tst.w	($FFFFFC20).w
 ;		bne.w	Cont_MainLoop
@@ -7907,12 +7907,12 @@ byte_4CCC:	dc.b 8,	2, 4, $FF, 2, 3, 8, $FF, 4, 2, 2, 3, 8,	$FD, 4,	2, 2, 3, 2, $
 ;Obj80_ChkType:				; XREF: Obj80_Index
 ;		tst.b	subtype(a0)
 ;		beq.s	loc_4F40
-;		cmpi.b	#6,($FFFFD024).w
+;		cmpi.b	#6,(MainCharacter+routine).w
 ;		bcs.s	loc_4F40
 ;		move.b	($FFFFFE0F).w,d0
 ;		andi.b	#1,d0
 ;		bne.s	loc_4F40
-;		tst.w	($FFFFD010).w
+;		tst.w	(MainCharacter+x_vel).w
 ;		bne.s	Obj80_Delete
 ;		rts	
 ; ===========================================================================
@@ -8106,7 +8106,7 @@ End_LoadData:
 
 End_LoadSonic:
 		move.b	#1,(Object_RAM).w ; load	Sonic object
-		bset	#0,($FFFFD022).w ; make	Sonic face left
+		bset	#0,(MainCharacter+status).w ; make	Sonic face left
 		move.b	#1,($FFFFF7CC).w ; lock	controls
 		move.w	#$400,($FFFFF602).w ; move Sonic to the	left
 		move.w	#$F800,(MainCharacter+inertia).w ; set Sonic's speed
@@ -8220,7 +8220,7 @@ loc_5334:
 End_MoveSonic:				; XREF: End_MainLoop
 		move.b	($FFFFF7D7).w,d0
 		bne.s	End_MoveSonic2
-		cmpi.w	#$90,($FFFFD008).w ; has Sonic passed $90 on y-axis?
+		cmpi.w	#$90,(MainCharacter+x_pos).w ; has Sonic passed $90 on y-axis?
 		bcc.s	End_MoveSonExit	; if not, branch
 		addq.b	#2,($FFFFF7D7).w
 		move.b	#1,($FFFFF7CC).w ; lock	player's controls
@@ -8231,7 +8231,7 @@ End_MoveSonic:				; XREF: End_MainLoop
 End_MoveSonic2:				; XREF: End_MoveSonic
 		subq.b	#2,d0
 		bne.s	End_MoveSonic3
-		cmpi.w	#$A0,($FFFFD008).w ; has Sonic passed $A0 on y-axis?
+		cmpi.w	#$A0,(MainCharacter+x_pos).w ; has Sonic passed $A0 on y-axis?
 		bcs.s	End_MoveSonExit	; if not, branch
 		addq.b	#2,($FFFFF7D7).w
 		moveq	#0,d0
@@ -8239,9 +8239,9 @@ End_MoveSonic2:				; XREF: End_MoveSonic
 		move.w	d0,($FFFFF602).w ; stop	Sonic moving
 		move.w	d0,(MainCharacter+inertia).w
 		move.b	#$81,($FFFFF7C8).w
-		move.b	#3,($FFFFD01A).w
-		move.w	#$505,($FFFFD01C).w ; use "standing" animation
-		move.b	#3,($FFFFD01E).w
+		move.b	#3,(MainCharacter+mapping_frame).w
+		move.w	#$505,(MainCharacter+anim).w ; use "standing" animation
+		move.b	#3,(MainCharacter+anim_frame_duration).w
 		rts	
 ; ===========================================================================
 
@@ -8249,9 +8249,9 @@ End_MoveSonic3:				; XREF: End_MoveSonic
 		subq.b	#2,d0
 		bne.s	End_MoveSonExit
 		addq.b	#2,($FFFFF7D7).w
-		move.w	#$A0,($FFFFD008).w
+		move.w	#$A0,(MainCharacter+x_pos).w
 		move.b	#$87,(Object_RAM).w ; load Sonic	ending sequence	object
-		clr.w	($FFFFD024).w
+		clr.w	(MainCharacter+routine).w
 
 End_MoveSonExit:
 		rts	
@@ -8389,15 +8389,15 @@ Obj88_Index:	dc.w Obj88_Main-Obj88_Index
 ; ===========================================================================
 
 Obj88_Main:				; XREF: Obj88_Index
-		cmpi.b	#2,($FFFFD01A).w
+		cmpi.b	#2,(MainCharacter+mapping_frame).w
 		beq.s	Obj88_Main2
 		addq.l	#4,sp
 		rts	
 ; ===========================================================================
 
 Obj88_Main2:				; XREF: Obj88_Main
-		move.w	($FFFFD008).w,8(a0) ; match X position with Sonic
-		move.w	($FFFFD00C).w,$C(a0) ; match Y position	with Sonic
+		move.w	(MainCharacter+x_pos).w,8(a0) ; match X position with Sonic
+		move.w	(MainCharacter+y_pos).w,$C(a0) ; match Y position	with Sonic
 		movea.l	a0,a1
 		moveq	#0,d3
 		moveq	#1,d2
@@ -8991,8 +8991,8 @@ LevSz_ChkLamp:				; XREF: LevelSizeLoad
 		tst.b	($FFFFFE30).w	; have any lampposts been hit?
 		beq.s	LevSz_StartLoc	; if not, branch
 		jsr	Obj79_LoadInfo
-		move.w	($FFFFD008).w,d1
-		move.w	($FFFFD00C).w,d0
+		move.w	(MainCharacter+x_pos).w,d1
+		move.w	(MainCharacter+y_pos).w,d0
 		;---------------------
 ; Fix the Frame Counter Bug   //   when start by a Lamppost not have this bug,
                   ; but after correct the main bug, you see zeros in place of the numbers
@@ -9036,10 +9036,10 @@ LevSz_StartLoc:				; XREF: LevelSizeLoad
 LevSz_SonicPos:
 		moveq	#0,d1
 		move.w	(a1)+,d1
-		move.w	d1,($FFFFD008).w ; set Sonic's position on x-axis
+		move.w	d1,(MainCharacter+x_pos).w ; set Sonic's position on x-axis
 		moveq	#0,d0
 		move.w	(a1),d0
-		move.w	d0,($FFFFD00C).w ; set Sonic's position on y-axis
+		move.w	d0,(MainCharacter+y_pos).w ; set Sonic's position on y-axis
 
 loc_60D0:				; XREF: LevSz_ChkLamp
 	clr.w	($FFFFF7A8).w		; reset Sonic's position tracking index
@@ -9879,13 +9879,13 @@ ScrollVertical:				; XREF: DeformBgLayer
 	sub.w	(a1),d0
 	tst.w	(Camera_Min_Y_pos).w		; Does this level y-wrap?
 	bpl.s	loc_D78E_v			; If not, branch and skip looping
-	cmpi.w	#$60,(Camera_Y_pos_bias).w	; Is screen in its default position?
+	cmpi.w	#$60,d3	; Is screen in its default position?
 	beq.s	@verticont				; If so, branch, and loop
 	; It's not at its default position; Sonic must be looking up or down
 	tst.w	(Sonic_Look_delay_counter).w	; Is Sonic still looking up or down?
 	bne.s	@verticont				; If so, branch, and keep looping, Sonic ain't moving anywhere!
 	; So, Sonic was looking up or down, but now he isn't
-	move.w	#$60,(Camera_Y_pos_bias).w	; move the screen to its default position quickly
+	move.w	#$60,d3	; move the screen to its default position quickly
 @verticont:
 	andi.w	#$7FF,d0			; Forever loop
 
@@ -10823,7 +10823,7 @@ loc_DF1E:
 	move.w	(a0),d3
 	andi.w	#$3FF,d3
 	lsl.w	#3,d3
-	lea	($FFFFB000).w,a1
+	lea	(Block_Table).w,a1
 	adda.w	d3,a1
 	move.l	d1,d0
 	bsr.w	sub_E174
@@ -10877,7 +10877,7 @@ loc_DFB8:
 	move.w	(a0),d3
 	andi.w	#$3FF,d3
 	lsl.w	#3,d3
-	lea	($FFFFB000).w,a1
+	lea	(Block_Table).w,a1
 	adda.w	d3,a1
 	bsr.w	sub_E0D4
 	addq.w	#2,a0
@@ -11110,7 +11110,7 @@ sub_E244:
 
 	add.w	(a3),d5
 	add.w	4(a3),d4
-	lea	($FFFFB000).w,a1
+	lea	(Block_Table).w,a1
 	move.w	d4,d3
 	add.w	d3,d3
 	andi.w	#$F00,d3
@@ -11391,7 +11391,7 @@ MainLoadBlockLoad3:
 		move.l	(a2)+,d0
 		andi.l	#$FFFFFF,d0
 		movea.l	d0,a0
-		lea	($FFFFB000).w,a1
+		lea	(Block_Table).w,a1
 		bsr.w	JmpTo_KosDec	; load block maps
 		move.l	(a2)+,d0
 		andi.l	#$FFFFFF,d0
@@ -11497,7 +11497,7 @@ loc_6DAC:				; XREF: DynScrResizeLoad
 		addq.w	#8,d0
 		cmp.w	($FFFFF72E).w,d0
 		bcs.s	loc_6DC4
-		btst	#1,($FFFFD022).w
+		btst	#1,(MainCharacter+status).w
 		beq.s	loc_6DC4
 		add.w	d1,d1
 		add.w	d1,d1
@@ -11698,7 +11698,7 @@ locret_6F64:
 Resize_SBZ3:
 		cmpi.w	#$D00,($FFFFF700).w
 		bcs.s	locret_6F8C
-		cmpi.w	#$18,($FFFFD00C).w ; has Sonic reached the top of the level?
+		cmpi.w	#$18,(MainCharacter+y_pos).w ; has Sonic reached the top of the level?
 		bcc.s	locret_6F8C	; if not, branch
 		clr.b	($FFFFFE30).w
 		move.w	#1,($FFFFFE02).w ; restart level
@@ -14352,7 +14352,7 @@ Obj2A_Main:				; XREF: Obj2A_Index
 Obj2A_OpenShut:				; XREF: Obj2A_Index
 		move.w	#$40,d1
 		clr.b	$1C(a0)		; use "closing"	animation
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		add.w	d1,d0
 		cmp.w	8(a0),d0
 		bcs.s	Obj2A_Animate
@@ -14493,7 +14493,7 @@ Obj44_SolidWall2:			; XREF: Obj44_SolidWall
 		bcc.s	loc_8B48
 		tst.b	($FFFFF7C8).w
 		bmi.s	loc_8B48
-		cmpi.b	#6,($FFFFD024).w
+		cmpi.b	#6,(MainCharacter+routine).w
 		bcc.s	loc_8B48
 		if DebuggingFeatures = 1
 		tst.w	($FFFFFE08).w
@@ -15043,7 +15043,7 @@ loc_9212:
 
 loc_9224:				; XREF: Obj28_Index
 		move.w	8(a0),d0
-		sub.w	($FFFFD008).w,d0
+		sub.w	(MainCharacter+x_pos).w,d0
 		bcs.s	loc_923C
 		subi.w	#$180,d0
 		bpl.s	loc_923C
@@ -15210,7 +15210,7 @@ locret_93EA:
 loc_93EC:
 		bset	#0,1(a0)
 		move.w	8(a0),d0
-		sub.w	($FFFFD008).w,d0
+		sub.w	(MainCharacter+x_pos).w,d0
 		bcc.s	locret_9402
 		bclr	#0,1(a0)
 
@@ -15221,7 +15221,7 @@ locret_9402:
 
 
 sub_9404:
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		subi.w	#$B8,d0
 		rts	
@@ -15598,7 +15598,7 @@ Obj22_ChkNrSonic:			; XREF: Obj22_Index2
 		jsr	SpeedToPos
 		tst.b	$34(a0)
 		bne.s	locret_992A
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bpl.s	Obj22_SetNrSonic
 		neg.w	d0
@@ -16117,7 +16117,7 @@ Obj4B_Collect:				; XREF: Obj4B_Index
 		move.w	8(a0),8(a1)
 		move.w	$C(a0),$C(a1)
 		move.l	a0,$3C(a1)
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		cmp.w	8(a0),d0	; has Sonic come from the left?
 		bcs.s	Obj4B_PlaySnd	; if yes, branch
 		bset	#0,1(a1)	; reverse flash	object
@@ -17301,7 +17301,7 @@ Obj2D_ChkSonic:				; XREF: Obj2D_Index2
 		move.w	#$60,d2
 		jsr	Obj2D_ChkSonic2
 		bcc.s	locret_AE20
-		move.w	($FFFFD00C).w,d0
+		move.w	(MainCharacter+y_pos).w,d0
 		sub.w	$C(a0),d0
 		bcc.s	locret_AE20
 		cmpi.w	#-$80,d0
@@ -17324,7 +17324,7 @@ locret_AE20:
 Obj2D_ChkSonic2:			; XREF: Obj2D_ChkSonic
 		move.w	#$80,d1
 		bset	#0,status(a0)
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	loc_AE40
 		neg.w	d0
@@ -18232,7 +18232,7 @@ loc_B97C:
 ; ===========================================================================
 
 Obj31_Type03:				; XREF: Obj31_TypeIndex
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	loc_B98C
 		neg.w	d0
@@ -23482,7 +23482,7 @@ Obj42_Index2:	dc.w Obj42_ChkDist-Obj42_Index2
 
 Obj42_ChkDist:				; XREF: Obj42_Index2
 		bset	#0,status(a0)
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	loc_DDEA
 		neg.w	d0
@@ -23507,7 +23507,7 @@ Obj42_Type00:				; XREF: Obj42_Index2
 		cmpi.b	#4,mapping_frame(a0)	; has "appearing" animation finished?
 		bcc.s	Obj42_Fall	; is yes, branch
 		bset	#0,status(a0)
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	locret_DE32
 		bclr	#0,status(a0)
@@ -23666,7 +23666,7 @@ Obj43_Index2:	dc.w Obj43_RollChk-Obj43_Index2
 ; ===========================================================================
 
 Obj43_RollChk:				; XREF: Obj43_Index2
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		subi.w	#$100,d0
 		bcs.s	loc_E0D2
 		sub.w	8(a0),d0	; check	distance between Roller	and Sonic
@@ -23741,7 +23741,7 @@ locret_E150:
 Obj43_Stop:				; XREF: Obj43_ChkJump
 		tst.b	$32(a0)
 		bmi.s	locret_E188
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		subi.w	#$30,d0
 		sub.w	8(a0),d0
 		bcc.s	locret_E188
@@ -24144,7 +24144,7 @@ Obj46_Type00:				; XREF: Obj46_TypeIndex
 ; ===========================================================================
 
 Obj46_Type02:				; XREF: Obj46_TypeIndex
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	loc_E888
 		neg.w	d0
@@ -24953,7 +24953,7 @@ Obj0D_Main:				; XREF: Obj0D_Index
 		move.w	#$200,priority(a0)
 
 Obj0D_Touch:				; XREF: Obj0D_Index
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcs.s	locret_EBBA
 		cmpi.w	#$20,d0		; is Sonic within $20 pixels of	the signpost?
@@ -25023,7 +25023,7 @@ Obj0D_SonicRun:				; XREF: Obj0D_Index
 		bne.w	locret_ECEE	; if yes, branch
 		else
 		endif
-		btst	#1,($FFFFD022).w
+		btst	#1,(MainCharacter+status).w
 		bne.s	loc_EC70
 		move.b	#1,($FFFFF7CC).w ; lock	controls
 		move.w	#$800,($FFFFF602).w ; make Sonic run to	the right
@@ -25031,7 +25031,7 @@ Obj0D_SonicRun:				; XREF: Obj0D_Index
 loc_EC70:
 		tst.b	(Object_RAM).w
 		beq.s	loc_EC86
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		move.w	($FFFFF72A).w,d1
 		addi.w	#$128,d1
 		cmp.w	d1,d0
@@ -25138,7 +25138,7 @@ loc_EDCC:				; XREF: Obj4C_Index
 		subq.w	#1,$32(a0)
 		bpl.s	locret_EDF0
 		move.w	$34(a0),$32(a0)
-		move.w	($FFFFD00C).w,d0
+		move.w	(MainCharacter+y_pos).w,d0
 		move.w	$C(a0),d1
 		cmp.w	d1,d0
 		bcc.s	locret_EDF0
@@ -25412,7 +25412,7 @@ loc_F0C8:
 		move.b	#4,mapping_frame(a1)
 
 Obj4E_Action:				; XREF: Obj4E_Index
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	Obj4E_ChkSonic
 		neg.w	d0
@@ -25420,7 +25420,7 @@ Obj4E_Action:				; XREF: Obj4E_Index
 Obj4E_ChkSonic:
 		cmpi.w	#$C0,d0		; is Sonic within $C0 pixels (x-axis)?
 		bcc.s	Obj4E_Move	; if not, branch
-		move.w	($FFFFD00C).w,d0
+		move.w	(MainCharacter+y_pos).w,d0
 		sub.w	$C(a0),d0
 		bcc.s	loc_F0F4
 		neg.w	d0
@@ -25457,7 +25457,7 @@ Obj4E_Solid:				; XREF: Obj4E_Index
 Obj4E_Animate:
 		lea	(Ani_obj4E).l,a1
 		jsr	AnimateSprite
-		cmpi.b	#4,($FFFFD024).w
+		cmpi.b	#4,(MainCharacter+routine).w
 		bcc.s	Obj4E_ChkDel
 		jsr	SpeedToPos
 
@@ -26107,7 +26107,7 @@ loci_FAD0:
 loci_FB0E:
 		tst.b ($FFFFF7C8).w
 		bmi.w loci_FB92
-		cmpi.b #6,($FFFFD024).w
+		cmpi.b #6,(MainCharacter+routine).w
 		bcc.w loci_FB92
 		if DebuggingFeatures = 1
 		tst.w ($FFFFFE08).w
@@ -27136,7 +27136,7 @@ Obj55_ChkDrop:				; XREF: Obj55_Index2
 		move.w	#$80,d2
 		jsr	Obj55_ChkSonic
 		bcc.s	Obj55_NoDrop
-		move.w	($FFFFD00C).w,d0
+		move.w	(MainCharacter+y_pos).w,d0
 		move.w	d0,$36(a0)
 		sub.w	$C(a0),d0
 		bcs.s	Obj55_NoDrop
@@ -27192,7 +27192,7 @@ Obj55_PlaySnd:				; XREF: Obj55_Index2
 
 loc_101A0:
 		jsr	SpeedToPos
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	loc_101B0
 		neg.w	d0
@@ -27230,7 +27230,7 @@ locret_101F4:
 Obj55_ChkSonic:				; XREF: Obj55_ChkDrop
 		move.w	#$100,d1
 		bset	#0,status(a0)
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	loc_10214
 		neg.w	d0
@@ -27439,7 +27439,7 @@ Obj56_Type05:				; XREF: Obj56_TypeIndex
 		cmpi.b	#3,$3C(a0)
 		bne.s	loc_1047A
 		clr.b	($FFFFF7C9).w
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		cmp.w	8(a0),d0
 		bcc.s	loc_1047A
 		move.b	#1,($FFFFF7C9).w
@@ -28837,7 +28837,7 @@ Obj0C_Solid:
 		clr.b	($FFFFF7C9).w	; enable wind tunnel
 		tst.b	mapping_frame(a0)		; is the door open?
 		bne.s	Obj0C_Display	; if yes, branch
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		cmp.w	8(a0),d0	; is Sonic in front of the door?
 		bcc.s	Obj0C_Display	; if yes, branch
 		move.b	#1,($FFFFF7C9).w ; disable wind	tunnel
@@ -29395,7 +29395,7 @@ locret_11AD0:
 ; ===========================================================================
 
 Obj5F_ChkSonic:				; XREF: Obj5F_Walk; Obj5F_Wait
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	loc_11ADE
 		neg.w	d0
@@ -29403,7 +29403,7 @@ Obj5F_ChkSonic:				; XREF: Obj5F_Walk; Obj5F_Wait
 loc_11ADE:
 		cmpi.w	#$60,d0
 		bcc.s	locret_11B5E
-		move.w	($FFFFD00C).w,d0
+		move.w	(MainCharacter+y_pos).w,d0
 		sub.w	$C(a0),d0
 		bcc.s	Obj5F_MakeFuse
 		neg.w	d0
@@ -29594,7 +29594,7 @@ locret_11DBC:
 ; ===========================================================================
 
 Obj60_ChkSonic:				; XREF: Obj60_Index
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcc.s	loc_11DCA
 		neg.w	d0
@@ -29602,7 +29602,7 @@ Obj60_ChkSonic:				; XREF: Obj60_Index
 loc_11DCA:
 		cmpi.w	#$A0,d0		; is Sonic within $A0 pixels of	orbinaut?
 		bcc.s	Obj60_Animate	; if not, branch
-		move.w	($FFFFD00C).w,d0
+		move.w	(MainCharacter+y_pos).w,d0
 		sub.w	$C(a0),d0
 		bcc.s	loc_11DDC
 		neg.w	d0
@@ -32245,7 +32245,7 @@ loc_13336:
 Boundary_Bottom:
 		cmpi.w	#$501,($FFFFFE10).w	; is level SBZ2 ?
 		bne.w	KillCharacter_JMP		; if not, kill Sonic
-		cmpi.w	#$2000,($FFFFD008).w	; is player at the sequence where Eggman presses the switch
+		cmpi.w	#$2000,(MainCharacter+x_pos).w	; is player at the sequence where Eggman presses the switch
 		bcs.w	KillCharacter_JMP	; if not, kill Sonic
 		move.w	#1,($FFFFFE02).w	; restart the level
 		move.w	#$103,($FFFFFE10).w	; set level	to SBZ3	(LZ4)
@@ -33561,8 +33561,8 @@ loc_138D4:
 		move.w	#0,$3A(a0)
 		move.b	#$39,(Object_RAM+next_object2).w ; load TIME object
 		move.b	#$39,(Object_RAM+next_object3).w ; load OVER object
-		move.b	#2,($FFFFD09A).w
-		move.b	#3,($FFFFD0DA).w
+		move.b	#2,(Object_RAM+next_object2+mapping_frame).w
+		move.b	#3,(Object_RAM+next_object3+mapping_frame).w
 		bra.s	loc_138C2
 ; ===========================================================================
 
@@ -34337,9 +34337,9 @@ loc_1A4E4:
 			move.w	(a1)+,x_pos(a0)
 			move.w	(a1)+,y_pos(a0)
 Obj8D_Show_exception:
-      move.w   ($FFFFD002).w,2(a0)      ; copy Sonic map to after-image map
-       move.b   ($FFFFD001).w,1(a0)      ; copy Sonic frame infos (horizontal/vertical mirror, coordinate system......)
-       move.l   ($FFFFD01A).w,mapping_frame(a0)   ; copy the Sonic animation frame
+      move.w   (MainCharacter+art_tile).w,art_tile(a0)      ; copy Sonic map to after-image map
+       move.b   (MainCharacter+render_flags).w,render_flags(a0)      ; copy Sonic frame infos (horizontal/vertical mirror, coordinate system......)
+       move.l   (MainCharacter+mapping_frame).w,mapping_frame(a0)   ; copy the Sonic animation frame
       jmp   DisplaySprite
 ; ===========================================================================
 Obj8D_Delete:
@@ -34697,7 +34697,7 @@ loc_140A6:
 
 loc_140AC:
 		move.w	#$1E,air_left(a1)
-		clr.b	($FFFFD372).w
+;		clr.b	($FFFFD372).w
 ;locret_Super:
 		rts	
 ; End of function ResumeMusic
@@ -35056,9 +35056,9 @@ Obj4A_Main2:
 		move.w	#120,$30(a0)	; set time for Sonic's disappearance to 2 seconds
 
 Obj4A_RmvSonic:				; XREF: Obj4A_Index
-;		move.w	($FFFFD008).w,8(a0)
-;		move.w	($FFFFD00C).w,$C(a0)
-;		move.b	($FFFFD022).w,status(a0)
+;		move.w	(MainCharacter+x_pos).w,8(a0)
+;		move.w	(MainCharacter+y_pos).w,$C(a0)
+;		move.b	(MainCharacter+status).w,status(a0)
 ;		lea	(Ani_obj4A).l,a1
 ;		jsr	AnimateSprite
 		move.b	#1,mapping_frame(a0)
@@ -36804,6 +36804,90 @@ loc_14AFC:
 		rts	
 ; End of function FindFloor2
 
+; ===========================================================================
+
+; Checks a 16x16 block to find solid ground or ceiling. May check an additional
+; 16x16 block up for ceilings.
+; d2 = y_pos
+; d3 = x_pos
+; d5 = ($c,$d) or ($e,$f) - solidity type bit (L/R/B or top)
+; d6 = $0000 for no flip, $0800 for vertical flip
+; a4 = pointer to angle buffer
+; returns relevant block ID in (a1)
+; returns distance in d1
+; returns angle in (a4)
+
+; loc_1E910: Obj_CheckInFloor:
+Ring_FindFloor:
+	bsr.w	Floor_ChkTile
+	move.w	(a1),d0
+	move.w	d0,d4
+	andi.w	#$3FF,d0
+	beq.s	loc_1E922
+	btst	d5,d4
+	bne.s	loc_1E928
+
+loc_1E922:
+	move.w	#$10,d1
+	rts
+; ===========================================================================
+
+loc_1E928:
+	movea.l	($FFFFF796).w,a2
+	move.b	(a2,d0.w),d0
+	andi.w	#$FF,d0
+	beq.s	loc_1E922
+	lea	(AngleMap).l,a2
+	move.b	(a2,d0.w),(a4)
+	lsl.w	#4,d0
+	move.w	d3,d1
+	btst	#$A,d4
+	beq.s	R_FindFloor1
+	not.w	d1
+	neg.b	(a4)
+R_FindFloor1:
+	btst	#$B,d4
+	beq.s	R_FindFloor2
+	addi.b	#$40,(a4)
+	neg.b	(a4)
+	subi.b	#$40,(a4)
+R_FindFloor2:
+	andi.w	#$F,d1
+	add.w	d0,d1
+	lea	(CollArray1).l,a2
+	move.b	(a2,d1.w),d0
+	ext.w	d0
+	eor.w	d6,d4
+	btst	#$B,d4
+	beq.s	R_FindFloor3
+	neg.w	d0
+R_FindFloor3:
+	tst.w	d0
+	beq.s	loc_1E922
+	bmi.s	loc_1E996
+	cmpi.b	#$10,d0
+	beq.s	loc_1E9A2
+	move.w	d2,d1
+	andi.w	#$F,d1
+	add.w	d1,d0
+	move.w	#$F,d1
+	sub.w	d0,d1
+	rts
+; ===========================================================================
+
+loc_1E996:
+	move.w	d2,d1
+	andi.w	#$F,d1
+	add.w	d1,d0
+	bpl.w	loc_1E922
+
+loc_1E9A2:
+	sub.w	a3,d2
+	bsr.w	FindFloor2
+	add.w	a3,d2
+	subi.w	#$10,d1
+	rts
+; ===========================================================================
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -37119,22 +37203,6 @@ loc_14D3C:
 
 ; End of function Sonic_WalkSpeed
 
-; =============== S U B R O U T I N E =======================================
-
-; sub_F994:
-RingCheckFloorDist:
-		move.w	x_pos(a0),d3
-		move.w	y_pos(a0),d2
-		move.b	y_radius(a0),d0
-		ext.w	d0
-		add.w	d0,d2
-		lea	($FFFFF768).w,a4
-		move.b	#0,(a4)
-		movea.w	#$10,a3
-		move.w	#0,d6
-		moveq	#$C,d5
-		jmp	FindFloor
-; End of function RingCheckFloorDist
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -37290,6 +37358,22 @@ locret_14E4E:
 		rts	
 ; End of function ObjHitFloor2
 
+; =============== S U B R O U T I N E =======================================
+
+; sub_F994:
+RingCheckFloorDist:
+		move.w	x_pos(a0),d3
+		move.w	y_pos(a0),d2
+		move.b	y_radius(a0),d0
+		ext.w	d0
+		add.w	d0,d2
+		lea	($FFFFF768).w,a4
+		move.b	#0,(a4)
+		movea.w	#$10,a3
+		move.w	#0,d6
+		moveq	#$C,d5
+		jmp	Ring_FindFloor
+; End of function RingCheckFloorDist
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -38211,12 +38295,12 @@ locret_15AB0:
 Obj6A_Type03:				; XREF: Obj6A_TypeIndex
 		tst.b	$3D(a0)
 		bne.s	Obj6A_Animate03
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		subi.w	#$C0,d0
 		bcs.s	loc_15B02
 		sub.w	8(a0),d0
 		bcs.s	loc_15B02
-		move.w	($FFFFD00C).w,d0
+		move.w	(MainCharacter+y_pos).w,d0
 		subi.w	#$80,d0
 		cmp.w	$C(a0),d0
 		bcc.s	locret_15B04
@@ -38252,11 +38336,11 @@ locret_15B24:
 Obj6A_Type04:				; XREF: Obj6A_TypeIndex
 		tst.b	$3D(a0)
 		bne.s	Obj6A_Animate04
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		addi.w	#$E0,d0
 		sub.w	8(a0),d0
 		bcc.s	loc_15B74
-		move.w	($FFFFD00C).w,d0
+		move.w	(MainCharacter+y_pos).w,d0
 		subi.w	#$80,d0
 		cmp.w	$C(a0),d0
 		bcc.s	locret_15B76
@@ -39888,8 +39972,8 @@ Obj79_StoreInfo:			; XREF: Obj79_HitLamp
 
 Obj79_LoadInfo:				; XREF: LevelSizeLoad
 		move.b	($FFFFFE31).w,($FFFFFE30).w
-		move.w	($FFFFFE32).w,($FFFFD008).w
-		move.w	($FFFFFE34).w,($FFFFD00C).w
+		move.w	($FFFFFE32).w,(MainCharacter+x_pos).w
+		move.w	($FFFFFE34).w,(MainCharacter+y_pos).w
 		move.w	($FFFFFE36).w,($FFFFFE20).w
 ;		move.b	($FFFFFE54).w,($FFFFFE1B).w
 		clr.w	($FFFFFE20).w
@@ -40435,7 +40519,7 @@ loc_17A46:
 ; ===========================================================================
 
 loc_17A50:
-		cmpi.b	#4,($FFFFD024).w
+		cmpi.b	#4,(MainCharacter+routine).w
 		bcs.s	loc_17A5A
 		moveq	#4,d1
 
@@ -40909,7 +40993,7 @@ loc_1806C:
 		swap	d0
 		move.w	d0,8(a0)
 		move.w	$12(a0),d0
-		move.w	($FFFFD00C).w,d1
+		move.w	(MainCharacter+y_pos).w,d1
 		sub.w	$C(a0),d1
 		bcs.s	loc_180A2
 		subi.w	#$48,d1
@@ -41036,7 +41120,7 @@ loc_1818C:
 ; ===========================================================================
 
 loc_18196:
-		cmpi.b	#4,($FFFFD024).w
+		cmpi.b	#4,(MainCharacter+routine).w
 		bcs.s	loc_181A0
 		moveq	#4,d1
 
@@ -41463,7 +41547,7 @@ loc_185DA:
 ; ===========================================================================
 
 loc_185E4:
-		cmpi.b	#4,($FFFFD024).w
+		cmpi.b	#4,(MainCharacter+routine).w
 		bcs.s	loc_185EE
 		moveq	#4,d1
 
@@ -42099,7 +42183,7 @@ loc_18C06:
 ; ===========================================================================
 
 loc_18C10:
-		cmpi.b	#4,($FFFFD024).w
+		cmpi.b	#4,(MainCharacter+routine).w
 		bcs.s	loc_18C1A
 		moveq	#4,d1
 
@@ -42708,7 +42792,7 @@ loc_192AE:
 		bgt.s	loc_192E8
 		tst.b	$3D(a0)
 		bne.s	loc_192E8
-		move.w	($FFFFD008).w,d1
+		move.w	(MainCharacter+x_pos).w,d1
 		subi.w	#$2C00,d1
 		asr.w	#5,d1
 		cmp.b	$34(a0),d1
@@ -43045,7 +43129,7 @@ loc_19574:				; XREF: off_19546
 ; ===========================================================================
 
 loc_1957E:
-		cmpi.b	#4,($FFFFD024).w
+		cmpi.b	#4,(MainCharacter+routine).w
 		bcs.s	locret_19588
 		moveq	#4,d1
 
@@ -43388,7 +43472,7 @@ Obj82_EggIndex:	dc.w Obj82_ChkSonic-Obj82_EggIndex
 
 Obj82_ChkSonic:				; XREF: Obj82_EggIndex
 		move.w	8(a0),d0
-		sub.w	($FFFFD008).w,d0
+		sub.w	(MainCharacter+x_pos).w,d0
 		cmpi.w	#128,d0		; is Sonic within 128 pixels of	Eggman?
 		bcc.s	loc_19934	; if not, branch
 		addq.b	#2,$25(a0)
@@ -43583,7 +43667,7 @@ Obj83_Solid2:
 
 loc_19C62:				; XREF: Obj83_Index
 		bclr	#3,$22(a0)
-		bclr	#3,($FFFFD022).w
+		bclr	#3,(MainCharacter+status).w
 		bra.w	loc_1982C
 ; ===========================================================================
 
@@ -43817,7 +43901,7 @@ loc_19F10:
 		tst.w	$32(a0)
 		bmi.w	loc_19FA6
 		bclr	#0,$22(a0)
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcs.s	loc_19F2E
 		bset	#0,$22(a0)
@@ -43839,7 +43923,7 @@ loc_19F48:
 
 loc_19F50:
 		addq.w	#7,($FFFFF636).w
-		cmpi.b	#2,($FFFFD01C).w
+		cmpi.b	#2,(MainCharacter+anim).w
 		bne.s	loc_19F48
 		move.w	#$300,d0
 		btst	#0,$22(a0)
@@ -43847,7 +43931,7 @@ loc_19F50:
 		neg.w	d0
 
 loc_19F6A:
-		move.w	d0,($FFFFD010).w
+		move.w	d0,(MainCharacter+x_vel).w
 		tst.b	$35(a0)
 		bne.s	loc_19F88
 		subq.b	#1,$21(a0)
@@ -43952,7 +44036,7 @@ loc_1A074:				; XREF: off_19E80
 loc_1A09A:
 		move.w	#$400,$10(a0)
 		move.w	8(a0),d0
-		sub.w	($FFFFD008).w,d0
+		sub.w	(MainCharacter+x_pos).w,d0
 		bpl.s	loc_1A0B4
 		move.w	#$500,$10(a0)
 		bra.w	loc_1A0F2
@@ -44077,7 +44161,7 @@ loc_1A210:
 		move.b	#$F,$20(a0)
 
 loc_1A216:
-		cmpi.w	#$2790,($FFFFD008).w
+		cmpi.w	#$2790,(MainCharacter+x_pos).w
 		blt.s	loc_1A23A
 		move.b	#1,($FFFFF7CC).w
 		move.w	#0,($FFFFF602).w
@@ -44087,9 +44171,9 @@ loc_1A216:
 		move.w	#$100,($FFFFF602).w
 
 loc_1A23A:
-		cmpi.w	#$27E0,($FFFFD008).w
+		cmpi.w	#$27E0,(MainCharacter+x_pos).w
 		blt.s	loc_1A248
-		move.w	#$27E0,($FFFFD008).w
+		move.w	#$27E0,(MainCharacter+x_pos).w
 
 loc_1A248:
 		cmpi.w	#$2900,8(a0)
@@ -44203,7 +44287,7 @@ loc_1A38A:
 
 loc_1A38E:				; XREF: Obj85_Index
 		move.b	#$B,$1A(a0)
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bcs.s	loc_1A3A6
 		tst.b	1(a0)
@@ -44339,7 +44423,7 @@ loc_1A550:
 
 loc_1A55C:
 		move.b	d0,$1A(a0)
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bmi.s	loc_1A578
 		subi.w	#$140,d0
@@ -44498,7 +44582,7 @@ loc_1A86C:
 		move.w	#$11,d3
 		move.w	8(a0),d4
 		jsr	SolidObject
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		bmi.s	loc_1A89A
 		subi.w	#$140,d0
@@ -44618,7 +44702,7 @@ loc_1A9E6:
 		move.b	#$9A,$20(a0)
 		move.w	#$B4,$28(a0)
 		moveq	#0,d0
-		move.w	($FFFFD008).w,d0
+		move.w	(MainCharacter+x_pos).w,d0
 		sub.w	8(a0),d0
 		move.w	d0,$10(a0)
 		move.w	#$140,$12(a0)
@@ -44726,8 +44810,8 @@ Obj3E_ChkOpened:
 		tst.b	$25(a0)		; has the prison been opened?
 		beq.s	Obj3E_DoOpen	; if yes, branch
 		clr.b	$25(a0)
-		bclr	#3,($FFFFD022).w
-		bset	#1,($FFFFD022).w
+		bclr	#3,(MainCharacter+status).w
+		bset	#1,(MainCharacter+status).w
 
 Obj3E_DoOpen:
 		move.b	#2,$1A(a0)	; use frame number 2 (destroyed	prison)
@@ -44753,8 +44837,8 @@ Obj3E_Switched:				; XREF: Obj3E_Index
 		move.b	#1,($FFFFF7CC).w ; lock	controls
 		move.w	#$800,($FFFFF602).w ; make Sonic run to	the right
 		clr.b	$25(a0)
-		bclr	#3,($FFFFD022).w
-		bset	#1,($FFFFD022).w
+		bclr	#3,(MainCharacter+status).w
+		bset	#1,(MainCharacter+status).w
 
 locret_1AC60:
 		rts	
@@ -45811,7 +45895,7 @@ SS_AniEmeraldSparks:			; XREF: SS_AniIndex
 		bne.s	locret_1B60C
 		clr.l	(a0)
 		clr.l	4(a0)
-		move.b	#4,($FFFFD024).w
+		move.b	#4,(MainCharacter+routine).w
 		move.w	#$6A,d0
 		jsr	(PlaySound_Special).l ;	play special stage GOAL	sound
 
@@ -45888,8 +45972,8 @@ SS_ChkEmldRepeat:
 SS_LoadData:
 		lsl.w	#2,d0
 		lea	SS_StartLoc(pc,d0.w),a1
-		move.w	(a1)+,($FFFFD008).w
-		move.w	(a1)+,($FFFFD00C).w
+		move.w	(a1)+,(MainCharacter+x_pos).w
+		move.w	(a1)+,(MainCharacter+y_pos).w
 		movea.l	SS_LayoutIndex(pc,d0.w),a0
 		lea	($FF4000).l,a1
 		move.w	#0,d0
@@ -48316,11 +48400,11 @@ HudDb_XY:				; XREF: HudDebug
 		move.l	#$5C400003,($C00004).l ; set VRAM address
 		move.w	($FFFFF700).w,d1 ; load	camera x-position
 		swap	d1
-		move.w	($FFFFD008).w,d1 ; load	Sonic's x-position
+		move.w	(MainCharacter+x_pos).w,d1 ; load	Sonic's x-position
 		bsr.s	HudDb_XY2
 		move.w	($FFFFF704).w,d1 ; load	camera y-position
 		swap	d1
-		move.w	($FFFFD00C).w,d1 ; load	Sonic's y-position
+		move.w	(MainCharacter+y_pos).w,d1 ; load	Sonic's y-position
 ; End of function HudDb_XY
 
 
@@ -48707,7 +48791,7 @@ Debug_Main:
 ;		bcc.s	loc_3D852
 ;		move.w	(MainCharacter+art_tile).w,($FFFFFF7E).w
 loc_3D852:
-		andi.w	#$7FF,($FFFFD00C).w
+		andi.w	#$7FF,(MainCharacter+y_pos).w
 		andi.w	#$7FF,($FFFFF704).w
 		andi.w	#$7FF,($FFFFF70C).w
 		clr.b	($FFFFF502).w
@@ -48882,7 +48966,7 @@ Debug_MakeItem:
 		beq.s	Debug_Exit	; if not, branch
 ;----------------------------------------------------
 ; Debug glitch fix ; Neto - Sonic 2D
-		cmpi.b  #$06, ($FFFFD024).w  
+		cmpi.b  #$06, (MainCharacter+routine).w  
 		bne.s   Player_Ok                              
 		rts                                          
 Player_Ok:                
@@ -48955,10 +49039,10 @@ Debug_Exitnormal:
 		bsr.s	sub_92C54
 		move.b	#$13,$16(a1) ; Set Sonic's vertical size
 		move.b	#9,$17(a1) ; Set Sonic's horizontal size
-;		clr.w ($FFFFD010).w ; Clear Sonic's horizontal speed
-;		clr.l ($FFFFD012).w ; Clear Sonic's vertical speed & inertia
+;		clr.w (MainCharacter+x_vel).w ; Clear Sonic's horizontal speed
+;		clr.l (MainCharacter+y_vel).w ; Clear Sonic's vertical speed & inertia
 ;		clr.b 	jumping(a0) ; Clear standing on object flag
-;		clr.b	($FFFFD022).w ; Set Sonic to air (Will clear any other state)
+;		clr.b	(MainCharacter+status).w ; Set Sonic to air (Will clear any other state)
 ;		clr.b	(MainCharacter+anim).w ; Set to roll animation
 ;		clr.b ($FFFFD025).w ; Clear secondary routine counter
 ;		addq.l	#4,sp ; Make Sonic unable to jump for small period of time (If I'm correct, it is 1 frame)
@@ -50680,7 +50764,7 @@ TA_MainLoop:
 ;		movem.l    d0-a6,-(sp)
 ;		jsr	LoadMenuOption
 ;		movem.l    (sp)+,d0-a6
-		cmpi.w	#$180,($FFFFD008).w ; has Sonic	run off	screen?
+		cmpi.w	#$180,(MainCharacter+x_pos).w ; has Sonic	run off	screen?
 		blt.w	TA_MainLoop3	; if not, branch
 TA_MainLoop2
 		movem.l    d0-a6,-(sp)
@@ -50712,7 +50796,7 @@ TA_MainLoop4:
 ;		bne.s	TA_3B10
 ;		else
 ;		endif
-;		cmpi.b	#6,($FFFFD024).w	; is Sonic dying?
+;		cmpi.b	#6,(MainCharacter+routine).w	; is Sonic dying?
 ;		bcc.s	TA_3B14		; if yes, branch
 
 ;TA_3B10:
@@ -50735,8 +50819,8 @@ TA_3B14:
 ;		jsr	RunPLC_RAM
 		jsr	OscillateNumDo
 		move.b	#7,(Object_RAM).w
-;		move.w	#$A4,($FFFFD008).w
-;		move.w	#$60,($FFFFD00C).w
+;		move.w	#$A4,(MainCharacter+x_pos).w
+;		move.w	#$60,(MainCharacter+y_pos).w
 		move.l	#0,($FFFFF700).w
 		move.l	#0,($FFFFF704).w
 		
