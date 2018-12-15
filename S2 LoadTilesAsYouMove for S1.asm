@@ -1108,9 +1108,9 @@ loc_E2E4:
 
 ;loc_E300:
 LoadTilesFromStart:
-	lea	(VDP_control_port).l,a5
-	lea	(VDP_data_port).l,a6
-	lea	(Camera_BG_X_pos).w,a3
+	lea	($C00004).l,a5
+	lea	($C00000).l,a6
+	lea	($FFFFF708).w,a3
 	lea	($FFFFA440).w,a4
 	move.w	#$6000,d2
 	moveq	#0,d4

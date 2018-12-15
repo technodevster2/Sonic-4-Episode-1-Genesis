@@ -5799,7 +5799,7 @@ loc_303BE8:					  ; ...
 		bsr.w	LevelSizeLoad
 		jsr	DeformBgLayer
 		clr.w	($FFFFF616).w
-		move.w	#-$E0,($FFFFF61E).w
+;		move.w	#-$E0,($FFFFF61E).w
 		lea	($FFFFCC00).w,a1
 		moveq	#0,d0
 		move.w	#$FF,d1
@@ -8945,40 +8945,80 @@ Jmpto_PalCycle_Load:
 
 
 LevelSizeLoad:				; XREF: TitleScreen; Level; EndingSequence
+		clr.w	($FFFFF754).w
+		clr.w	($FFFFF756).w
+		clr.w	($FFFFF758).w
+		clr.w	($FFFFF75A).w
+		clr.w	($FFFFFF30).w
+		clr.w	($FFFFFF32).w
+		clr.w	($FFFFFF34).w
+		clr.w	($FFFFFF36).w
+		clr.b	($FFFFF502).w
+		clr.b	($FFFFF744).w
 		moveq	#0,d0
-		move.b	d0,($FFFFF740).w
-		move.b	d0,($FFFFF741).w
-		move.b	d0,($FFFFF746).w
-		move.b	d0,($FFFFF748).w
-		move.b	d0,($FFFFF742).w
-		move.b	d0,($FFFFF502).w
+		move.b	d0,($FFFFF742).w ; load level boundaries
 		move.w	($FFFFFE10).w,d0
-		lsl.b	#6,d0
-		lsr.w	#4,d0
-		move.w	d0,d1
+		ror.b	#2,d0
+		lsr.w	#6,d0
 		add.w	d0,d0
-		add.w	d1,d0
+		add.w	d0,d0
+;		add.w	d0,d0
+		add.w	d0,d0
 		lea	LevelSizeArray(pc,d0.w),a0 ; load level	boundaries
-		move.w	(a0)+,d0
-		move.w	d0,($FFFFF730).w
 		move.l	(a0)+,d0
 		move.l	d0,($FFFFF728).w
 		move.l	d0,($FFFFF720).w
 		move.l	(a0)+,d0
 		move.l	d0,($FFFFF72C).w
 		move.l	d0,($FFFFF724).w
-		move.w	($FFFFF728).w,d0
-		addi.w	#$240,d0
-		move.w	d0,($FFFFF732).w
 		move.w	#$1010,($FFFFF74A).w
-		move.w	(a0)+,d0
-		move.w	d0,($FFFFF73E).w
+		move.w	#$60,($FFFFF73E).w
 		bra.w	LevSz_ChkLamp
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Level size array and ending start location array
 ; ---------------------------------------------------------------------------
-LevelSizeArray:	incbin	misc\lvl_size.bin
+
+; ----------------------------------------------------------------------------
+; LEVEL SIZE ARRAY
+
+; This array defines the screen boundaries for each act in the game.
+; ----------------------------------------------------------------------------
+;		xstart	xend	ystart	yend	; ZID ; Zone
+
+LevelSizeArray:
+	dc.w	$0,	$24BF,	$0,	$300	; $00  ; EHZ act 2
+	dc.w	$0,	$1EBF,	$0,	$300		; EHZ act 2
+	dc.w	$0,	$2960,	$0,	$300		; EHZ act 2
+	dc.w	$0,	$24BF,	$0,	$300		; EHZ act 2
+	dc.w	$0,	$19BF,	$0,	$530	; LZ
+	dc.w	$0,	$10AF,	$0,	$720	; $01
+	dc.w	$0,	$202F,	$FF00,	$800
+	dc.w	$0,	$20BF,	$0,	$720
+	dc.w	$0,	$17BF,	$0,	$1D0	; MZ
+	dc.w	$0,	$17BF,	$0,	$520
+	dc.w	$0,	$1800,	$0,	$720
+	dc.w	$0,	$17BF,	$0,	$720
+	dc.w	$0,	$2000,	$0,	$6C0	; SLZ
+	dc.w	$0,	$3EC0,	$0,	$720
+	dc.w	$0,	$22C0,	$0,	$6C0
+	dc.w	$0,	$2000,	$0,	$6C0
+	dc.w	$0,	$28C0,	$0,	$520	; SYZ
+	dc.w	$0,	$2C00,	$0,	$620
+	dc.w	$0,	$2EC0,	$0,	$620
+	dc.w	$0,	$28C0,	$0,	$520
+	dc.w	$0,	$21C0,	$0,	$720	; SBZ
+	dc.w	$0,	$1E40,	$FF00,	$800
+	dc.w	$2080,	$2460,	$510,	$510
+	dc.w	$0,	$21C0,	$0,	$720
+	dc.w	$0,	$17BF,	$0,	$1D0	; END
+	dc.w	$0,	$17BF,	$0,	$520
+	dc.w	$0,	$1800,	$0,	$720
+	dc.w	$0,	$17BF,	$0,	$720
+	dc.w	$0,	$17BF,	$0,	$1D0	; ABZ
+	dc.w	$0,	$17BF,	$0,	$520
+	dc.w	$0,	$1800,	$0,	$720
+	dc.w	$0,	$17BF,	$0,	$720
 		even
 
 EndingStLocArray:
@@ -9244,8 +9284,11 @@ loc_628E:
 		clr.w	($FFFFF756).w
 		clr.w	($FFFFF758).w
 		clr.w	($FFFFF75A).w
+		clr.w	($FFFFF73A).w
+		clr.w	($FFFFF73C).w
 ;		tst.w	($FFFFFE02).w
 ;		bne.w	@scrolllockcode
+;		movem.l	d2-a6,-(sp)
 		lea	(Object_RAM).w,a0
 		lea	($FFFFF700).w,a1
 		lea	($FFFFF728).w,a2
@@ -9274,14 +9317,15 @@ loc_628E:
 		bsr.w	ScrollVertical
 		lea	($FFFFF74B).w,a2
 		bsr.w	SetVertiScrollFlags
+;		movem.l	(sp)+,d2-a6
 @scrolllockcode:
 		bsr.w	DynScrResizeLoad
-		move.w	($FFFFF700).w,($FFFFF61A).w
+;		move.w	($FFFFF700).w,($FFFFF61A).w
 		move.w	($FFFFF704).w,($FFFFF616).w
-		move.w	($FFFFF708).w,($FFFFF61C).w
+;		move.w	($FFFFF708).w,($FFFFF61C).w
 		move.w	($FFFFF70C).w,($FFFFF618).w
-		move.w	($FFFFF718).w,($FFFFF620).w
-		move.w	($FFFFF71C).w,($FFFFF61E).w
+;		move.w	($FFFFF718).w,($FFFFF620).w
+;		move.w	($FFFFF71C).w,($FFFFF61E).w
 		move.l	(Camera_X_pos).w,(Camera_X_pos_copy).w
 		move.l	(Camera_Y_pos).w,(Camera_Y_pos_copy).w
 		cmpi.b	#4,(Game_Mode).w	;exit if on the Title
@@ -16679,34 +16723,36 @@ Obj2E_ChkS:
 		bne.w	S_MonNoTransAnim		; if yes, branch
 		tst.b	(Update_HUD_timer).w ; is the timer stopped?
 		beq.w	S_MonNoTransAnim	; if yes, branch
-		btst	#6,status(a1)	; Check if underwater, return if not
-		beq.s	locsup
-		move.w	#$500,(Sonic_top_speed).w
-		move.w	#$18,(Sonic_acceleration).w
-		move.w	#$80,(Sonic_deceleration).w
-locsup:
+;		btst	#6,status(a1)	; Check if underwater, return if not
+;		beq.s	locsup
+;		move.w	#$500,(Sonic_top_speed).w
+;		move.w	#$18,(Sonic_acceleration).w
+;		move.w	#$80,(Sonic_deceleration).w
+;locsup:
 ;		move.b	#1,(Transforming_Flag-1).w
 ;		addi.w	#$32,($FFFFFE20).w
 		move.b	#1,($FFFFF65F).w
 		move.b	#$F,($FFFFF65E).w
 		move.b	#1,($FFFFFE19).w
 		move.w	#$3C,(Super_Sonic_frame_count).w
-		move.w	#$800,($FFFFF760).w
-		move.w	#$18,($FFFFF762).w
-		move.w	#$C0,($FFFFF764).w
+		movem.l a0-a2,-(sp)		; Move a0, a1 and a2 onto stack
+		lea	(MainCharacter).w,a0	; Load Sonic to a0
+		lea	(Sonic_top_speed).w,a2	; Load Sonic_top_speed into a2
+		jsr	ApplySpeedSettings	; Fetch Speed settings
+		movem.l (sp)+,a0-a2		; Move a0, a1 and a2 from stack
 		move.b	#$1F,anim(a1)
 		jsr	Super_and_Invincibility_Stars_Jmp
 		move.b	#$8E,(Object_RAM+next_object17).w	; load Obj7E (super sonic stars object) at Object_RAM+next_object
 ;	moveq	#$23,d0
 ;	jsr	(LoadPLC).l	; load Super Sonic's life counter patterns
-		cmpi.w	#2,($FFFFFFA0).w
-		bne.s	loc_864F8
-		move.b	#0,($FFFFFE19).w
-		move.b	#1,($FFFFF667).w
-		move.b	#$29,anim(a1)
-		move.w	#$800,($FFFFFEC0).w
-		move.w	#$18,($FFFFFEC2).w
-		move.w	#$C0,($FFFFFEC4).w
+;		cmpi.w	#2,($FFFFFFA0).w
+;		bne.s	loc_864F8
+;		move.b	#0,($FFFFFE19).w
+;		move.b	#1,($FFFFF667).w
+;		move.b	#$29,anim(a1)
+;		move.w	#$800,($FFFFFEC0).w
+;		move.w	#$18,($FFFFFEC2).w
+;		move.w	#$C0,($FFFFFEC4).w
 ;		move.l	#Obj_HyperTails_Birds,($FFFFCD7C).w
 ;		bra.s	loc_8652C
 ; ---------------------------------------------------------------------------
@@ -19031,7 +19077,7 @@ loc_13C6E:
 	
 	move.w	#$26,(Object_RAM+next_object6+$34).w
 	clr.w	(Vscroll_Factor).w
-	move.w	#-$E0,($FFFFF61E).w
+;	move.w	#-$E0,($FFFFF61E).w
 
 	lea	($FFFFCC00).w,a1
 	moveq	#0,d0
@@ -35087,6 +35133,9 @@ Obj4A_Wait:
 ; ----------------------------------------------------------------------------
 ; Pause Menu code (Version 2)
 ; ----------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
 BuildPauseMenu:
 	tst.w	(Game_Paused).w
 	beq.s	game_not_paused
@@ -35214,7 +35263,7 @@ byte_1265E:
 ; END OF FUNCTION CHUNK	FOR sub_33343A
 
 ; ----------------------------------------------------------------------------
-; Pause RetryMenu code (Version 2)
+; Retry Menu code
 ; ----------------------------------------------------------------------------
 BuildRetryMenu:
 	cmpi.b	#$40,($FFFFF600).w
@@ -35867,7 +35916,14 @@ Obj06_ChkDel:
 	andi.w	#$FF80,d0
 	sub.w	(Camera_X_pos_coarse).w,d0
 	cmpi.w	#$280,d0
-	bhi.s	JmpTo19_DeleteObject
+	bls.s	Obj06_NoDel
+	move.w	respawn_index(a0),d0	; get address in respawn table
+	beq.s	JmpTo19_DeleteObject		; if it's zero, don't remember object
+	movea.w	d0,a2	; load address into a2
+	bclr	#7,(a2)	; clear respawn table entry, so object can be loaded again
+	bra.s	JmpTo19_DeleteObject	; and delete object
+
+Obj06_NoDel:
 	rts
 ; ---------------------------------------------------------------------------
 JmpTo19_DeleteObject
@@ -47779,9 +47835,13 @@ Map_obj21_TimeAttack:
 Map_obj21SS:
 	include "_maps\obj21ss.asm"
 
-; ----------------------------------------------------------------------------
-; HUD code
-; ----------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
+; Subroutine to draw the HUD
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; loc_40804:
 BuildHUD:
 	tst.b	(Level_started_flag).w
 	beq.w	return_40858
