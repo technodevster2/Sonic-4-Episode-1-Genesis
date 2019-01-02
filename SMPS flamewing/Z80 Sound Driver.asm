@@ -1200,15 +1200,7 @@ zDoFrequencyFlutter_cont:
 		ld	c, (ix+zTrackFreqFlutterIndex)	; c = frequency flutter index
 		ld	b, 0							; b = 0
 		add	hl, bc							; hl += bc
-	if fix_sndbugs
-		; Fix based on similar code from Space Harrier II's sound driver.
-		; This is better than the previous fix, which was based on Ristar's driver.
-		ld	c, l
-		ld	b, h
-		ld	a, (bc)							; a = new modulation envelope value
-	else
 		ld	a, (hl)							; a = new frequency flutter value
-	endif
 		pop	hl								; Restore hl
 		bit	7, a							; Is frequency flutter negative?
 		jp	z, zlocPositiveFlutterMod			; Branch if not
@@ -1227,7 +1219,19 @@ zDoFrequencyFlutter_cont:
 ;loc_449
 zlocChangeFlutterIndex:
 		inc	bc								; Increment bc
+	if fix_sndbugs
+		; Fix based on similar code from Ristar's sound driver.
+		push	hl							; Save hl
+		add	hl, bc							; hl += bc
+		ld	a, (hl)							; a = new frequency flutter index
+		pop	hl								; Restore hl
+	else
+		; DANGER! Uses bc as a pointer, getting bytes from code region.
+		; This happens for several frequency flutters, so you should avoid them
+		; unless you enable the driver bug fixes.
+
 		ld	a, (bc)							; Use it as a pointer??? Getting bytes from code region?
+	endif
 		jr	zFreqFlutterSetIndex			; Set position to nonsensical value
 ; ---------------------------------------------------------------------------
 ;loc_44D
@@ -1238,7 +1242,19 @@ zlocResetFlutterMod:
 ;loc_450
 zlocFlutterIncMultiplier:
 		inc	bc								; Increment bc
+	if fix_sndbugs
+		; Fix based on similar code from Ristar's sound driver.
+		push	hl							; Save hl
+		add	hl, bc							; hl += bc
+		ld	a, (hl)							; a = what to add to flutter sensibility value
+		pop	hl								; Restore hl
+	else
+		; DANGER! Uses bc as a pointer, getting bytes from code region.
+		; Luckily, this does not happen for any of the existing frequency
+		; flutter.
+
 		ld	a, (bc)							; Use it as a pointer??? Getting bytes from code region?
+	endif
 		add	a, (ix+zTrackFreqFlutterSens)	; Add flutter sensibility to a...
 		ld	(ix+zTrackFreqFlutterSens), a	; ... then store new value
 		inc	(ix+zTrackFreqFlutterIndex)		; Advance flutter modulation...
@@ -2369,18 +2385,7 @@ zFMOperatorWriteLoop:
 ;loc_A16
 zPlaySegaSound:
 		call	zMusicFade					; Fade music before playing the sound
-	if fix_sndbugs
-		xor	a								; a = 0
-		ld	(zMusicNumber), a				; Clear M68K input queue...
-		ld	(zSFXNumber0), a				; ... including SFX slot 0...
-		ld	(zSFXNumber1), a				; ... and SFX slot 1
-		ld	(zSoundQueue0), a				; Also clear music queue entry 0...
-		ld	(zSoundQueue1), a				; ... and entry 1...
-		ld	(zSoundQueue2), a				; ... and entry 2
-		inc	a							; a = 1
-	else
 		ld	a, 1							; a = 1
-	endif
 		ld	(PlaySegaPCMFlag), a			; Set flag to play SEGA sound
 		pop	hl								; Restore hl
 		ret
@@ -3708,15 +3713,7 @@ zDoFlutter:
 		ld	c, (ix+zTrackVolFlutter)		; Get current PSG flutter index
 		ld	b, 0							; b = 0
 		add	hl, bc							; Offset into PSG flutter
-	if fix_sndbugs
-		; Fix based on similar code from Space Harrier II's sound driver.
-		; This is better than the previous fix, which was based on Ristar's driver.
-		ld	c, l
-		ld	b, h
-		ld	a, (bc)							; a = PSG volume envelope
-	else
 		ld	a, (hl)							; a = PSG flutter value
-	endif
 		pop	hl								; Restore hl
 		bit	7, a							; Is it a terminator?
 		jr	z, zDoFlutterAdvance			; Branch if not
@@ -3728,7 +3725,22 @@ zDoFlutter:
 		jr	z, zDoFlutterReset				; Branch if yes
 		
 		inc	bc								; Increment flutter index
+	if fix_sndbugs
+		; Fix based on similar code from Ristar's sound driver.
+		push	hl							; Save hl
+		add	hl, bc							; Offset into PSG flutter
+		ld	a, (hl)							; a = new PSG flutter value
+		pop	hl								; Restore hl
+	else
+		; DANGER! Will read data from code segment and use it as if it were valid!
+		; In order to get here, the flutter value would have to be:
+		; (1) negative;
+		; (2) not 80h, 81h or 83h.
+		; As it stands, none of the entries in the flutter tables will allow
+		; this code to execute.
+
 		ld	a, (bc)							; Get value from wherever the hell bc is pointing to
+	endif
 		jr	zDoFlutterSetValue				; Use this as new flutter index
 ; ---------------------------------------------------------------------------
 ;loc_1057
@@ -3764,7 +3776,7 @@ zKillTrack:
 		ld	(ix+zTrackFreqLow), a			; Clear low byte of frequency
 		ld	(ix+zTrackFreqHigh), a			; Clear high byte of frequency
 	endif
-	
+
 zRestTrack:
 		set	4, (ix+zTrackPlaybackControl)	; Set 'track is resting' bit
 		bit	2, (ix+zTrackPlaybackControl)	; Is SFX overriding this track?
@@ -3781,16 +3793,8 @@ zSilencePSGChannel:
 		or	a								; Is it an actual PSG channel?
 		ret	p								; Branch if not
 		ld	(zPSG), a						; Silence this channel
-	if fix_sndbugs
-		cp	0DFh							; Was this PSG3?
-		ret	nz								; Return if not
-	else
-		; This does not work as intended: since this function is called when
-		; a new channel is starting, this bit will almost inevitably be 0
-		; and the noise channel will not be silenced.
 		bit	0, (ix+zTrackPlaybackControl)	; Is this a noise channel?
 		ret	z								; Return if not
-	endif
 		ld	a, 0FFh							; Command to silence PSG3/Noise channel
 		ld	(zPSG), a						; Do it
 		ret
@@ -4325,7 +4329,7 @@ __LABEL__ label *
 soundBankStart := __LABEL__
     endm
 
-DebugSoundbanks := 1
+DebugSoundbanks := 0
 
 finishBank macro
 	if * > soundBankStart + $8000
@@ -4571,30 +4575,7 @@ DAC_D9_Setup:			DAC_Setup $20,DAC_D8_D9_Data
 ; Playlist
 ; ===========================================================================
 LevelMusic_Playlist:
-	dc.b $01,$02
-	dc.b $03,$04
-	dc.b $05,$06
-	dc.b $07,$08
-	dc.b $09,$0A
-	dc.b $0B,$0C
-	dc.b $0D,$0E
-	dc.b $0F,$10
-	dc.b $11,$12
-	dc.b $13,$14
-	dc.b $15,$15
-	dc.b $16,$17
-	dc.b $1A,$1A
-	dc.b $1C,$15
-	dc.b $20,$20
-	dc.b $21,$21
-	dc.b $22,$22
-	dc.b $23,$23
-	dc.b $24,$24
-	dc.b $1E,$1E
-	dc.b $1B,$1B
-	dc.b $1D,$1D
-	dc.b $19,$14
-	dc.b $17,$14
+		binclude "Sound/Music/Music playlist.bin"
 ; ---------------------------------------------------------------------------
 ; ===========================================================================
 ; DAC Banks

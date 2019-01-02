@@ -1,0 +1,17 @@
+Currently Implemented:
+
+S3k's priority system
+S3k's objects manager
+S3k's Ring Manager
+S3k's Sound driver (Flamewing)
+S2's BuildSprites_Multidraw routines (Subsprites)
+S2's LoadTilesAsYouMove Routines
+S2's Title Card Routines
+S2's HUD Code (not Obj21)
+
+Planned:
+
+Fixing buggy title cards
+Changing/finishing some music and game code (It's not final of course)
+
+Again it's not final. Some things will be removed or replaced in the final.

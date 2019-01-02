@@ -343,7 +343,7 @@ SkipSecurity:
 		moveq	#0,d0
 		movea.l	d0,a6
 		move.l	a6,usp
-		moveq   #VDPInitValues_End-VDPInitValues-1,d1 ; run the following loop $18 times
+		moveq	#$17,d1 ; run the following loop $18 times
 
 VDPInitLoop:
 		move.b	(a5)+,d5	; add $8000 to value
@@ -358,7 +358,7 @@ VDPInitLoop:
 WaitForZ80:
 		btst	d0,(a1)		; has the Z80 stopped?
 		bne.s	WaitForZ80	; if not, branch
-		moveq	#Z80StartupCodeEnd-Z80StartupCodeBegin-1,d2
+		moveq	#$25,d2
 
 Z80InitLoop:
 		move.b	(a5)+,(a0)+
@@ -383,7 +383,7 @@ ClrCRAMLoop:
 ClrVDPStuff:
 		move.l	d0,(a3)
 		dbf	d4,ClrVDPStuff
-		moveq   #PSGInitValues_End-PSGInitValues-1,d5
+		moveq	#3,d5
 
 PSGInitLoop:
 		move.b	(a5)+,$11(a3)
@@ -406,7 +406,8 @@ PortC_Ok:
 ;    	dc.w $AF01,$D91F,$1127,$0021,$2600,$F977,$EDB0,$DDE1,$FDE1,$ED47,$ED4F,$D1E1,$F108,$D9C1,$D1E1,$F1F9,$F3ED,$5636,$E9E9
 ;    endif
 ; ===========================================================================
-InitArray:	dc.w $8000		; VDP register start number
+InitArray:
+SetupValues:	dc.w $8000		; VDP register start number
 		dc.w $3FFF		; size of RAM/4
 		dc.w $100		; VDP register diff
 
@@ -415,132 +416,63 @@ InitArray:	dc.w $8000		; VDP register start number
 		dc.l z80_reset		; Z80 reset
 		dc.l vdp_data_port	; VDP data
 		dc.l vdp_control_port	; VDP control
-VDPInitValues:  ; values for VDP registers
+
 		dc.b 4			; VDP $80 - 8-colour mode
 		dc.b $14		; VDP $81 - Megadrive mode, DMA enable
 		dc.b ($C000>>10)	; VDP $82 - foreground nametable address
 		dc.b ($F000>>10)	; VDP $83 - window nametable address
 		dc.b ($E000>>13)	; VDP $84 - background nametable address
 		dc.b ($D800>>9)		; VDP $85 - sprite table address
-		dc.b 0
-		dc.b 0
-		dc.b 0
-		dc.b 0
-		dc.b $FF
-		dc.b 0
-		dc.b $81
-		dc.b $37
-		dc.b 0
-		dc.b 1
-		dc.b 1
-		dc.b 0
-		dc.b 0
-		dc.b $FF
-		dc.b $FF
-		dc.b 0
-		dc.b 0
-		dc.b $80
-VDPInitValues_End:
-		dc.l $40000080
-	;	dc.b $AF
-	;	dc.b 1
-	;	dc.b $D9
-	;	dc.b $1F
-	;	dc.b $11
-	;	dc.b $27
-	;	dc.b 0
-	;	dc.b $21
-	;	dc.b $26
-	;	dc.b 0
-	;	dc.b $F9
-	;	dc.b $77
-	;	dc.b $ED
-	;	dc.b $B0
-	;	dc.b $DD
-	;	dc.b $E1
-	;	dc.b $FD
-	;	dc.b $E1
-	;	dc.b $ED
-	;	dc.b $47
-	;	dc.b $ED
-	;	dc.b $4F
-	;	dc.b $D1
-	;	dc.b $E1
-	;	dc.b $F1
-	;	dc.b 8
-	;	dc.b $D9
-	;	dc.b $C1
-	;	dc.b $D1
-	;	dc.b $E1
-	;	dc.b $F1
-	;	dc.b $F9
-	;	dc.b $F3
-	;	dc.b $ED
-	;	dc.b $56
-	;	dc.b $36
-	;	dc.b $E9
-	;	dc.b $E9
-;		dc.l $81048F02
-;		dc.l $C0000000
-;		dc.l $40000010
-;		dc.b $9F
-;		dc.b $BF
-;		dc.b $DF
-;		dc.b $FF
+		dc.b 0			; VDP $86 - unused
+		dc.b 0			; VDP $87 - background colour
+		dc.b 0			; VDP $88 - unused
+		dc.b 0			; VDP $89 - unused
+		dc.b 255		; VDP $8A - HBlank register
+		dc.b 0			; VDP $8B - full screen scroll
+		dc.b $81		; VDP $8C - 40 cell display
+		dc.b ($DC00>>10)	; VDP $8D - hscroll table address
+		dc.b 0			; VDP $8E - unused
+		dc.b 1			; VDP $8F - VDP increment
+		dc.b 1			; VDP $90 - 64 cell hscroll size
+		dc.b 0			; VDP $91 - window h position
+		dc.b 0			; VDP $92 - window v position
+		dc.w $FFFF		; VDP $93/94 - DMA length
+		dc.w 0			; VDP $95/96 - DMA source
+		dc.b $80		; VDP $97 - DMA fill VRAM
+		dc.l $40000080		; VRAM address 0
 
-;		dc.b $AF,  1,$D9,$1F,$11,$27,  0,$21,$26,  0,$F9,$77,$ED,$B0,$DD,$E1; 0	; Z80 instructions
-;		dc.b $FD,$E1,$ED,$47,$ED,$4F,$D1,$E1,$F1,  8,$D9,$C1,$D1,$E1,$F1,$F9; 16
-;		dc.b $F3,$ED,$56,$36,$E9,$E9; 32
+		dc.b $AF		; xor	a
+		dc.b $01, $D9, $1F	; ld	bc,1fd9h
+		dc.b $11, $27, $00	; ld	de,0027h
+		dc.b $21, $26, $00	; ld	hl,0026h
+		dc.b $F9		; ld	sp,hl
+		dc.b $77		; ld	(hl),a
+		dc.b $ED, $B0		; ldir
+		dc.b $DD, $E1		; pop	ix
+		dc.b $FD, $E1		; pop	iy
+		dc.b $ED, $47		; ld	i,a
+		dc.b $ED, $4F		; ld	r,a
+		dc.b $D1		; pop	de
+		dc.b $E1		; pop	hl
+		dc.b $F1		; pop	af
+		dc.b $08		; ex	af,af'
+		dc.b $D9		; exx
+		dc.b $C1		; pop	bc
+		dc.b $D1		; pop	de
+		dc.b $E1		; pop	hl
+		dc.b $F1		; pop	af
+		dc.b $F9		; ld	sp,hl
+		dc.b $F3		; di
+		dc.b $ED, $56		; im1
+		dc.b $36, $E9		; ld	(hl),e9h
+		dc.b $E9		; jp	(hl)
 
-Z80StartupCodeBegin: ; loc_2CA:
-;    if (*)+$26 < $10000
-;    CPU Z80 ; start compiling Z80 code
-;    phase 0 ; pretend we're at address 0
-;	xor     a	; clear a to 0
-;	ld      bc,((Z80_RAM_End-Z80_RAM)-zStartupCodeEndLoc)-1 ; prepare to loop this many times
-;	ld      de,zStartupCodeEndLoc+1	; initial destination address
-;	ld      hl,zStartupCodeEndLoc	; initial source address
-;	ld      sp,hl	; set the address the stack starts at
-;	ld      (hl),a	; set first byte of the stack to 0
-;	ldir    	; loop to fill the stack (entire remaining available Z80 RAM) with 0
-;	pop     ix	; clear ix
-;	pop     iy	; clear iy
-;	ld      i,a	; clear i
-;	ld      r,a	; clear r
-;	pop     de	; clear de
-;	pop     hl	; clear hl
-;	pop     af	; clear af
-;	ex      af,af'	; swap af with af'
-;	exx		; swap bc/de/hl with their shadow registers too
-;	pop     bc	; clear bc
-;	pop     de	; clear de
-;	pop     hl	; clear hl
-;	pop     af	; clear af
-;	ld      sp,hl	; clear sp
-;	di      	; clear iff1 (for interrupt handler)
-;	im      1	; interrupt handling mode = 1
-;	ld      (hl),0E9H ; replace the first instruction with a jump to itself
-;	jp      (hl)      ; jump to the first instruction (to stay there forever)
-;    zStartupCodeEndLoc:
-;    dephase ; stop pretending
-;    CPU 68000	; switch back to 68000 code
-;    padding off ; unfortunately our flags got reset so we have to set them again...
-;    listing off
-;    supmode on
-;    else ; due to an address range limitation I could work around but don't think is worth doing so:
-;	message "Warning: using pre-assembled Z80 startup code."
-    	dc.w $AF01,$D91F,$1127,$0021,$2600,$F977,$EDB0,$DDE1,$FDE1,$ED47,$ED4F,$D1E1,$F108,$D9C1,$D1E1,$F1F9,$F3ED,$5636,$E9E9
-;    endif
-Z80StartupCodeEnd:
+		dc.w $8104		; VDP display mode
+		dc.w $8F02		; VDP increment
+		dc.l $C0000000		; CRAM write mode
+		dc.l $40000010		; VSRAM address 0
 
-	dc.w	$8104	; value for VDP display mode
-	dc.w	$8F02	; value for VDP increment
-	dc.l	$C0000000	; value for CRAM write mode
-	dc.l	$40000010	; unknown (VSRAM?)
-
-PSGInitValues:
-        dc.b    $9F,$BF,$DF,$FF ; values for PSG channel volumes
-PSGInitValues_End:
+		dc.b $9F, $BF, $DF, $FF	; values for PSG channel volumes
 ; ===========================================================================
 
 Test_LockOn:
@@ -1816,6 +1748,10 @@ Pause_Unpause_3:
 ;		move.b	#0,(Level_started_flag).w
 	btst	#button_A,$FFFFF604		; is A button pressed?
 	bne.s	Pause_UnpauseFin
+	tst.b	($FFFFFE19).w
+	beq.s	Pause_Unpause_4
+	move.b	#0,($FFFFFE19).w
+Pause_Unpause_4:
 	move.w	#1,($FFFFFE02).w ; restart level
 ;		jmp		Pause_UnpauseFin
 		
@@ -8962,7 +8898,7 @@ LevelSizeLoad:				; XREF: TitleScreen; Level; EndingSequence
 		lsr.w	#6,d0
 		add.w	d0,d0
 		add.w	d0,d0
-;		add.w	d0,d0
+	;		add.w	d0,d0
 		add.w	d0,d0
 		lea	LevelSizeArray(pc,d0.w),a0 ; load level	boundaries
 		move.l	(a0)+,d0
@@ -9001,13 +8937,13 @@ LevelSizeArray:
 	dc.w	$0,	$17BF,	$0,	$720
 	dc.w	$0,	$2000,	$0,	$6C0	; SLZ
 	dc.w	$0,	$3EC0,	$0,	$720
-	dc.w	$0,	$22C0,	$0,	$6C0
 	dc.w	$0,	$2000,	$0,	$6C0
+	dc.w	$0,	$22C0,	$0,	$6C0
 	dc.w	$0,	$28C0,	$0,	$520	; SYZ
 	dc.w	$0,	$2C00,	$0,	$620
 	dc.w	$0,	$2EC0,	$0,	$620
 	dc.w	$0,	$28C0,	$0,	$520
-	dc.w	$0,	$21C0,	$0,	$720	; SBZ
+	dc.w	$0,	$2280,	-$100,	$800	; SBZ
 	dc.w	$0,	$1E40,	$FF00,	$800
 	dc.w	$2080,	$2460,	$510,	$510
 	dc.w	$0,	$21C0,	$0,	$720
@@ -32244,7 +32180,7 @@ Sonic_LevelBound:			; XREF: Obj01_MdNormal; et al
 		move.w	($FFFFF728).w,d0
 		addi.w	#$10,d0
 		cmp.w	d1,d0		; has Sonic touched the	side boundary?
-		bgt.w	Boundary_Sides	; if yes, branch. Changed to bgt because of the x-wrap bug that can happen.
+		bgt.w	Boundary_Sides	; if yes, branch. Changed to bgt because of the x-wrap bug that can happen when Sonic's X position is a negative value. (beyond the left boundary)
 		move.w	($FFFFF72A).w,d0
 		addi.w	#$128,d0
 		tst.b	($FFFFF7AA).w
