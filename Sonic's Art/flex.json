@@ -1,6 +1,6 @@
 {
     "description": "Flex 2 Project File",
-    "name": "Sonic Sprite",
+    "name": "Title Cards",
     "objects": [
         {
             "name": "SonicArt",
@@ -26,6 +26,33 @@
                 "format": "Sonic 1",
                 "customDefinition": "",
                 "label": "SonicDPLC"
+            }
+        },
+        {
+            "name": "",
+            "palettes": [
+                {
+                    "path": "..\\..\\..\\Sonic2\\art\\palettes\\SonicAndTails.bin",
+                    "length": 1
+                }
+            ],
+            "art": {
+                "path": "..\\..\\..\\Sonic2\\art\\nemesis\\Font using large broken letters.bin",
+                "compression": "Nemesis"
+            },
+            "mappings": {
+                "path": "..\\..\\..\\Sonic2\\mappings\\sprite\\Obj34_s1.bin",
+                "format": "Sonic 1",
+                "customDefinition": "",
+                "label": "",
+                "accessor": ""
+            },
+            "dplcs": {
+                "enabled": false,
+                "path": "",
+                "format": "Sonic 1",
+                "customDefinition": "",
+                "label": ""
             }
         }
     ]

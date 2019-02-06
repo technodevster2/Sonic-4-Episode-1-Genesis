@@ -143,7 +143,7 @@ Super_Sonic_palette		equ $FFFFF65F
 Ctrl_2_Logical		equ $FFFFF66A ; 2 bytes
 Ctrl_2_Held_Logical		equ $FFFFF66A ; 1 byte
 Ctrl_2_Press_Logical		equ $FFFFF66B ; 1 byte
-Sonic_Look_delay_counter 	equ $FFFFC903 ; 2 bytes
+Sonic_Look_delay_counter 	equ $FFFFFC02 ; 2 bytes
 Tails_Look_delay_counter 	equ $FFFFF66E ; 2 bytes
 Super_Sonic_frame_count	equ $FFFFF670
 Plc_Buffer			equ $FFFFF680 ; Pattern load queue

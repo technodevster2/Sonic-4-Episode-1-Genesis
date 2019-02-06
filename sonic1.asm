@@ -5492,16 +5492,16 @@ MusicList1:
         dc.b  $16, $16, $16, $16	; 6 - END
         dc.b  $13, $13, $13, $13	; 7 - Cutscene
 		even	
-MusicListAlt:
-        dc.b  1, 2, 3, 1			; 0 - GHZ
-        dc.b  4, 5, 6, $C			; 1 - LZ
-        dc.b  $22, $22, $22, $22	; 2 - MZ
-        dc.b  $23, $23, $23, $23	; 3 - SLZ
-        dc.b  7, $12, 9, 7			; 4 - SYZ
-        dc.b  $A, $B, $D,	$A		; 5 - SBZ
-        dc.b  $16, $16, $16, $16	; 6 - END
-        dc.b  $13, $13, $13, $13	; 7 - Cutscene
-		even
+;MusicListAlt:
+;        dc.b  1, 2, 3, 1			; 0 - GHZ
+;        dc.b  4, 5, 6, $C			; 1 - LZ
+;        dc.b  $22, $22, $22, $22	; 2 - MZ
+;        dc.b  $23, $23, $23, $23	; 3 - SLZ
+;        dc.b  7, $12, 9, 7			; 4 - SYZ
+;        dc.b  $A, $B, $D,	$A		; 5 - SBZ
+;        dc.b  $16, $16, $16, $16	; 6 - END
+;        dc.b  $13, $13, $13, $13	; 7 - Cutscene
+;		even
 ;SpecialStage_PlayList:	incbin	misc\speciallist.bin
 ;		even
 ; ===========================================================================
@@ -5534,7 +5534,7 @@ loc_3039B4:					  ; ...
 		bmi.w	Level_ClrRam
 		move	#$2700,sr
 		bsr.w	ClearScreen
-		jsr	LoadTitleCard
+		jsr	(LoadTitleCard).l ; load title card patterns
 		move	#$2300,sr
 		moveq	#0,d0
 		move.w	d0,($FFFFFE04).w
@@ -5707,9 +5707,13 @@ Level_GetBGM:					  ; ...
 		lea	(MusicList1).l,a1	; load Music Playlist for Acts 1
 		tst.b	(Level_Music+5).w
 		beq.s	LevelBGM_ActAlt
-		lea	(MusicListAlt).l,a1	; load Music Playlist for Acts 1
+		cmpi.w	#$401,($FFFFFE10).w
+		bne.s	LevelBGM_ActAlt
+		move.w	#$12,d0
+		bra.s	LevelBGM_ActAlt2
 LevelBGM_ActAlt:
 		move.b	(a1,d0.w),d0	; add d0 to a1
+LevelBGM_ActAlt2:
 		move.w	d0,(Level_Music).w	; store level music
 		bsr.w	PlaySound	; play music
 		move.b	#$34,(Object_RAM+next_object2).w
@@ -5747,6 +5751,7 @@ loc_303C0C:					  ; ...
 		jsr	LoadZoneTiles
 		jsr	MainLoadBlockLoad ; load block mappings	and pallets
 	;	move	#$2700,sr
+		jsr	(loc_402D4).l
 		jsr	LoadTilesFromStart
 	;	move	#$2300,sr
 ;		jsr	FloorLog_Unk
@@ -5872,14 +5877,14 @@ loc_303DD6:					  ; ...
 		tst.b	(Object_RAM+next_object5).w
 		bne.s	loc_303DD6
 		lea	(Object_RAM+next_object2).w,a1
-		move.b	#$16,$24(a1)
-		move.w	#$2D,$1E(a1)
-		move.b	#$16,$64(a1)
-		move.w	#$2D,$5E(a1)
-		tst.b	$80(a1)
+		move.b	#$16,routine(a1)
+		move.w	#$2D,anim_frame_duration(a1)
+		move.b	#$16,next_object+routine(a1)
+		move.w	#$2D,next_object+anim_frame_duration(a1)
+		tst.b	next_object2(a1)
 		beq.s	loc_303E24
-		move.b	#$16,$A4(a1)
-		move.w	#$2D,$9E(a1)
+		move.b	#$16,next_object2+routine(a1)
+		move.w	#$2D,next_object2+anim_frame_duration(a1)
 
 loc_303E24:					  ; ...
 		move.b	#0,($FFFFF7CC).w
@@ -7074,7 +7079,7 @@ ChangeRingFrame_Dynamic:
 	movem.l (sp)+,d0-a6
 	rts
 ; End of function ChangeRingFrame_Dynamic
-RingSizes:
+RingSizes:		; Ring Mapping size array
 	dc.w	$40
 	dc.w	$40
 	dc.w	$20
@@ -9232,6 +9237,7 @@ loc_628E:
 		lea	($FFFFF73A).w,a4
 		lea	($FFFFFC00).w,a5
 		lea	(Sonic_Pos_Record_Buf).w,a6
+		movem.l	d2,-(sp)
 		move.w	($FFFFF7A8).w,d2
 ;		cmp.w	#2,($FFFFFF70).w
 ;		bne.s	loc_30A704
@@ -9240,6 +9246,7 @@ loc_628E:
 
 ;loc_30A704:
 		bsr.w	ScrollHoriz2
+		movem.l	(sp)+,d2
 		lea	($FFFFF74A).w,a2
 		bsr.w	ScrollHoriz
 		lea	(Camera_Y_pos).w,a1
@@ -19342,7 +19349,7 @@ BranchTo10_DeleteObject
 ; ==========================================================================
 ; ===========================================================================
 Title_Cards_Mappings:
-				include s2titlecardss1n.asm
+				include s2titlecardss1nv2.asm
 				even
 ;		moveq	#0,d0
 	else
@@ -20537,6 +20544,7 @@ LoadTitleCard0:
 	lea	(ArtNem_TitleCard).l,a0
 	bsr.w	JmpTo2_NemDec
 	lea	($FFFFA400).w,a4
+	adda.l	a4,a4
 	lea	(ArtNem_TitleCard2).l,a0
 	bra.w	JmpTo_NemDecToRAM
 ; ===========================================================================
@@ -20553,6 +20561,7 @@ LoadTitleCard:
 loc_157EC:
 	move	#$2700,sr
 	lea	($FFFFA400).w,a1
+	adda.l	a1,a1
 	lea	(VDP_data_port).l,a6
 	move.l	d0,4(a6)
 
@@ -20603,15 +20612,10 @@ Title_Y:	 equ $5604
 ; ===========================================================================
 ; unknown
 TitleCardData:	dc.b EHZ_TitleCard-EHZ_TitleCard  ; 0
-		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 1
-		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 2
-		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 3
-		dc.b MTZ_TitleCard-EHZ_TitleCard  ; 4
-		dc.b MTZ_TitleCard-EHZ_TitleCard  ; 5
-		dc.b WFZ_TitleCard-EHZ_TitleCard  ; 6
-		dc.b HTZ_TitleCard-EHZ_TitleCard  ; 7
-		dc.b HPZ_TitleCard-EHZ_TitleCard  ; 8
-		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 9
+		dc.b LLZ_TitleCard-EHZ_TitleCard  ; 4
+		dc.b SVC_TitleCard-EHZ_TitleCard  ; 7
+		dc.b WPZ_TitleCard-EHZ_TitleCard  ; 8
+		dc.b CNZ_TitleCard-EHZ_TitleCard  ; 9
 		dc.b OOZ_TitleCard-EHZ_TitleCard  ; 10
 		dc.b MCZ_TitleCard-EHZ_TitleCard  ; 11
 		dc.b CNZ_TitleCard-EHZ_TitleCard  ; 12
@@ -20620,13 +20624,29 @@ TitleCardData:	dc.b EHZ_TitleCard-EHZ_TitleCard  ; 0
 		dc.b ARZ_TitleCard-EHZ_TitleCard  ; 15
 		dc.b SCZ_TitleCard-EHZ_TitleCard  ; 16
 		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
+		dc.b EHZ_TitleCard-EHZ_TitleCard  ; 17
 EHZ_TitleCard:	dc.w Title_S, Title_P, Title_L,	Title_A, Title_H, Title_I, -1	; EHZ
-MTZ_TitleCard:	dc.w Title_M,Title_T,Title_R,Title_P,Title_L,Title_I,Title_S; 0	; ...
+LLZ_TitleCard:	dc.w Title_L, Title_S, Title_T, Title_A, Title_B, Title_Y, Title_R, Title_I, Title_H, -1 ;LLZ
+SVC_TitleCard:	dc.w Title_S, Title_Y, Title_L, Title_V, Title_A, Title_I,-1; 0 ; ...
+WPZ_TitleCard:	dc.w Title_W, Title_H, Title_I, Title_T, Title_P, Title_A, Title_R, Title_K; 0	; ...
 		dc.w -1				  ; 7
-HTZ_TitleCard:	dc.w Title_H,Title_I,Title_L,Title_T,Title_P,-1; 0 ; ...
-HPZ_TitleCard:	dc.w Title_H,Title_I,Title_D,Title_P,Title_A,Title_L,Title_C; 0	; ...
-		dc.w -1				  ; 7
-OOZ_TitleCard:	dc.w Title_I,Title_L,Title_C,Title_A,-1; 0 ; ...
+OOZ_TitleCard:	dc.w Title_M, Title_A, Title_D, Title_G, Title_R,-1; 0 ; ...
 MCZ_TitleCard:	dc.w Title_M,Title_Y,Title_S,Title_T,Title_I,Title_C,Title_A; 0	; ...
 		dc.w Title_V,-1			  ; 7
 CNZ_TitleCard:	dc.w Title_C, Title_A, Title_S, Title_I, Title_T, Title_R, -1, 0, 0			  ; 7			  ; 7
@@ -32368,140 +32388,90 @@ JDSpeedsettings:
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
-Sonic_Homingattack:
-		tst.b   ($FFFFFF7F).w      ; is Sonic chasing some object?
-		bne.w   HA_Move            ; if yes, chase him
-;		jsr	Obj01_AfterImage_Start	; if yes, don't negate it
-		move.b	($FFFFF603).w,d1	; read controller
-		andi.b	#$70,d1				; is A, B or C pressed?
-		beq.w	Sonic_HA_rts		; if not, branch
+Sonic_HomingAttack:
+;		btst	#$70,($FFFFF603).w ; C button
+	move.b	($FFFFF603).w,d0
+	andi.b	#$70,d0
+		beq.s	hom_end
+		btst	#0,($FFFFFF7F).w ; already used an attack?
+		bne.s	hom_end
+		move.b #2,anim(a0)
+		move.w	x_pos(a0),d4
+		move.w	y_pos(a0),d5
+		lea	(Object_RAM+next_object32).w,a1 ; set object RAM start address
+		move.w	#$5F,d6
+		
+hom_loop:
+		move.w	#$B6,d0	; spindash zoom sound
+		jsr	(PlaySound).l	
+		tst.b	render_flags(a1)		; render flags
+		bpl.s	hom_next
+		move.b	collision_flags(a1),d0	; load collision type		
+		bne.s	LaunchAttack	
 
-		lea		(Object_RAM+next_object32).w,a1	; start at the first level object RAM
-
-; ---------------------------------------------------------------------------
-
-HA_enemylist:
-		tst.b	(a1)			; is a Null object
-		beq.s	HA_nextobject	; if yes, branch
-		cmpi.b	#5,collision_flags(a1)		; is not an enemy object? (spring, explosion, platform, collected ring, flame thrower (SBZ), among others)
-		bcs.w	HA_nextobject	; if yes, branch
-		; cmpi.b	#5,collision_flags(a1)		; is Burrobot enemy (LZ)
-		; beq.w	HA_calcdistance	; if yes, branch
-		; cmpi.b	#6,collision_flags(a1)		; is Crabmeat enemy (GHZ, SYZ)
-		; beq.s	HA_calcdistance	; if yes, branch
-		; cmpi.b	#8,collision_flags(a1)		; is Buzz Bomber enemy (GHZ, MZ, SYZ)
-		; beq.s	HA_calcdistance	; if yes, branch
-		; cmpi.b	#9,collision_flags(a1)		; is Chopper enemy (GHZ)
-		; beq.s	HA_calcdistance	; if yes, branch
-		; cmpi.b	#$A,collision_flags(a1)	; is Jaws enemy (LZ)
-		; beq.s	HA_calcdistance	; if yes, branch
-		; cmpi.b	#$B,collision_flags(a1)	; is Caterkiller enemy (MZ, SBZ) / Orbinaut enemy (LZ, SLZ, SBZ) / Basaran enemy (MZ)
-		; beq.s	HA_calcdistance	; if yes, branch
-		; cmpi.b	#$C,collision_flags(a1)	; is Roller enemy (SYZ) / Newtron enemy (GHZ)
-		; beq.s	HA_calcdistance	; if yes, branch	
-		; cmpi.b	#$D,collision_flags(a1)	; is Newtron enemy (GHZ)
-		; beq.s	HA_calcdistance	; if yes, branch
-		; cmpi.b	#$E,collision_flags(a1)	; is Roller enemy (SYZ)
-		; beq.s	HA_calcdistance	; if yes, branch
-		; cmpi.b	#$F,collision_flags(a1)	; is Eggman
-		; beq.s	HA_calcdistance	; if yes, branch
-		cmpi.b	#$F,collision_flags(a1)		; is some enemy of the list above?
-		bls.s	HA_calcdistance ; if yes, branch
-		cmpi.b	#$46,collision_flags(a1)	; is the monitor?
-		beq.s	HA_calcdistance ; if yes, branch
-		; cmpi.b	#$47,collision_flags(a1)		; is the ring?
-		; beq.s	HA_calcdistance 		; if yes, branch
-		cmpi.b	#$52,collision_flags(a1)	; is giant ring for entry to special stage?
-		beq.s	HA_calcdistance ; if yes, branch
-		cmpi.b	#$CC,collision_flags(a1)	; is Yadrin enemy (SYZ)
-		beq.s	HA_calcdistance ; if yes, branch
-
-HA_nextobject:
-		adda.w  #$40,a1			; jump to next object RAM entry
-		cmpa.w  #$F000,a1		; already tested all object RAM entry?
-		blt.s   HA_enemylist	; if not, return to enemy list
-;		bsr.w	Sonic_JumpDash		; if not, perform a simple jump dash :P
-HA_nextobject_rts:
+hom_next:
+		lea	next_object(a1),a1	; next object RAM
+		dbf	d6,hom_loop	; repeat $5F more times
+	; no object found -> simple jumpdash:
+		bset	#0,($FFFFFF7F).w
+		clr.w	y_vel(a0)
+		move.w	#$A00,x_vel(a0)
+		btst	#0,status(a0)	; hztl direction
+		beq.s	hom_end
+		neg.w	x_vel(a0)		
+hom_end:
 		rts
-
+		
 ; ---------------------------------------------------------------------------
+LaunchAttack:
+		cmpi.b	#$46,d0		; monitor
+		beq.s	prep
+		;andi.b	#$80,d0		; only accept 00 = enemy, 01 = inc routine
+		andi.b	#$C0,d0		; only accept 00 = enemy
+		bne.s	NoLaunch		
+	prep:
+		move.w	y_pos(a1),d2
+		sub.w	d5,d2
+		bpl.s	above
+		cmpi.w	#-$60,d2
+		blt.s	NoLaunch	; out of y_range
+		bra.s	cont
+	above:
+		cmpi.w	#$60,d2
+		bgt.s	NoLaunch	; out of y_range
+	cont:
+		move.w	x_pos(a1),d1
+		sub.w	d4,d1		; x_pos difference
+		bmi.s	haleft
+		btst	#0,status(a0)
+		bne.s	NoLaunch
+		cmpi.w	#$90,d2
+		bgt.s	NoLaunch	; out of x_range
+		bra.s	DoLaunch
+	haleft:
+		btst	#0,status(a0)
+		beq.s	NoLaunch
+		cmpi.w	#-$90,d2
+		blt.s	NoLaunch	; out of x_range
 
-HA_calcdistance:	; distance calculator
-		move.w  8(a1),d1	; move the object x-position to d1
-		move.w  $C(a1),d2	; move the object y-position to d2
-		sub.w   8(a0),d1	; sub sonic x-position of object x-position
-		sub.w   $C(a0),d2	; sub sonic y-position of object y-position
-; ---------------------------------------------------------------------------
-
-; test if the Sonic is facing the object
-		btst    #0,status(a0)	; is sonic facing left?
-		beq.s   HA_faceleft	; if yes, branch
-		cmpi.w  #8,d1		; is distance of Sonic, less than 8 pixels of the object?
-		blt.s   HA_calcdistance2	; if yes, branch
-		bra.s   HA_nextobject
-
-HA_faceleft:
-		cmpi.w  #-8,d1		; is distance of Sonic, greater than -8 pixels of the object?
-		bgt.s   HA_calcdistance2	; if yes, branch
-		bra.s   HA_nextobject
-; end of test
-
-; ---------------------------------------------------------------------------
-
-HA_calcdistance2:		; continuation of distance calculator
-;		tst.b	(Transforming_Flag-1).w	; has Sonic transformed Once?
-;		beq.w	HA_calcdistance3		; if yes, branch (Keeps you from transforming multiple times while in the air)		
-;		move.b	#0,($FFFFFF7F).w
-;		bra.w	HA_Move
-;HA_calcdistance3:
-		muls.w  d1,d1	; horizontal distance squared
-		muls.w  d2,d2	; vertical distance squared
-		add.l   d2,d1	; add vertical distance to horizontal distance
-		cmp.l   #16384,d1		; is distance of Sonic, greater than or equal 128 pixels of the object? (128^2=16384 // $80^2=$4000)
-		bge.s   HA_nextobject	; if yes, don't execute the homing attack
-		bclr   #4,status(a0)         ; clear "uncontrolled jump" flag
-		move.b	#2,anim(a0)
-		move.w   #$B6,d0            ; set homing attack sound
-		jsr   (PlaySound_Special).l         ; play homing attack sound
-		move.b   #30,($FFFFFF7F).w   ; number of frames Sonic can chasing the object
-		move.l   a1,($FFFFFF02).w   ; save the object address that Sonic is chasing
-		move.w	#$B6,d0				; set homing attack sound
-		jsr	(PlaySound_Special).l			; play homing attack sound
-		bclr	#4,status(a0)			; clear "uncontrolled jump" flag
-		move.b	#30,($FFFFFF7F).w	; number of frames Sonic can chasing the object
-		move.l	a1,($FFFFFF02).w	; save the object address that Sonic is chasing
-; ---------------------------------------------------------------------------
-
-HA_Move:
-		movea.l	($FFFFFF02).w,a1	; load the object address that Sonic is chasing
-		subi.b	#1,($FFFFFF7F).w	; sub 1 of frames counter
-		tst.b	($FFFFFF7F).w		; the time to the Sonic chasing some object is over?
-		beq.w	Sonic_HA_rts		; if yes, don't make the Homing Attack
-; Recalculating the distance between the Sonic and the object (d1 = x distance / d2 = y distance)
-		move.w  8(a1),d1   ; move the object x-position to d1
-		move.w  $C(a1),d2   ; move the object y-position to d2
-		sub.w   8(a0),d1   ; sub sonic x-position of object x-position
-		sub.w   $C(a0),d2   ; sub sonic y-position of object y-position
-		tst.b   ($FFFFFF7F).w      ; the time to the Sonic chasing some object is over?
-		beq.w   Sonic_HA_rts      ; if yes, don't make the Homing Attack
-; ---------------------------------------------------------------------------
-
-; Recalculating the distance between the Sonic and the object (d1 = x distance / d2 = y distance)
-		move.w  8(a1),d1	; move the object x-position to d1
-		move.w  $C(a1),d2	; move the object y-position to d2
-		sub.w   8(a0),d1	; sub sonic x-position of object x-position
-		sub.w   $C(a0),d2	; sub sonic y-position of object y-position
-
-		jsr		(CalcAngle).l	; calculates the angle
-		jsr		(CalcSine).l	; calculates the sine and the cosine
-		muls.w  #$C,d1			; multiply cosine by $C
-		move.w  d1,x_vel(a0)		; move d1 to X-velocity
-		muls.w  #$C,d0			; multiply sine by $C
-		move.w  d0,y_vel(a0)		; move d0 to Y-velocity
-
-Sonic_HA_rts:
-		rts						; return
-; Command of Homingattack end here
+DoLaunch:
+;		move.w	#$3C+$80,d0	; spindash zoom sound
+;		jsr	(PlaySound).l	
+		; d1 and d2 already contain x and y distance
+		jsr	(CalcAngle).l
+		jsr	(CalcSine).l
+		;asl.w	#4,d1
+		;asl.w	#4,d0
+		muls.w	#$C,d1
+		muls.w	#$C,d0
+		move.w	d1,x_vel(a0) ; $10
+		move.w	d0,y_vel(a0) ; $12
+		or.b	#3,($FFFFFF7F).w ; set both flags
+		rts
+		
+NoLaunch:
+		bra.w	hom_next
+; End of function Sonic_HomingAttack
 
 ; ---------------------------------------------------------------------------
 ; Subroutine allowing Sonic to jump
@@ -39771,7 +39741,7 @@ Map_obj78:
 ; ---------------------------------------------------------------------------
 
 Obj79:					; XREF: Obj_Index
-	tst.b	($FFFFFE2C).w
+	tst.b	($FFFFFE2C).w ; No checkpoints in Time attack
 	beq.w	Obj79_Cont
 	jsr	DeleteObject
 	rts
@@ -40660,12 +40630,8 @@ Obj48_Base:				; XREF: Obj48_Index
 loc_17BC6:
 		moveq	#0,d4
 		move.b	(a2)+,d4
-    if object_size=$40
-	lsl.w	#6,d0
-    else
-	mulu.w	#object_size,d0
-    endif
-		addi.l	#Object_RAM,d4
+		lsl.w	#6,d4
+		addi.l	#$FFD000,d4
 		movea.l	d4,a1
 		move.b	(a3)+,d0
 		cmp.b	$3C(a1),d0
@@ -47771,6 +47737,173 @@ Map_obj21_TimeAttack:
 Map_obj21SS:
 	include "_maps\obj21ss.asm"
 
+; ===========================================================================
+
+loc_402D4:
+	cmpi.b	#7,(Current_Zone).w
+	bne.s	loc_402EC
+	bsr.w	loc_407C0
+	move.b	#-1,($FFFFF7F1).w
+	move.w	#-1,($FFFFA820).w
+
+loc_402EC:
+	cmpi.b	#$D,(Current_Zone).w
+	bne.s	loc_402FA
+	move.b	#-1,($FFFFF7F1).w
+
+loc_402FA:
+	moveq	#0,d0
+	move.b	(Current_Zone).w,d0
+	add.w	d0,d0
+	move.w	AnimPatMaps(pc,d0.w),d0
+	lea	AnimPatMaps(pc,d0.w),a0
+	tst.w	(Two_player_mode).w
+	beq.s	loc_4031E
+	cmpi.b	#$C,(Current_Zone).w
+	bne.s	loc_4031E
+	lea	(APM_CNZ2P).l,a0
+
+loc_4031E:
+	tst.w	(a0)
+	beq.s	return_40336
+	lea	(Block_Table).w,a1
+	adda.w	(a0)+,a1
+	move.w	(a0)+,d1
+	tst.w	(Two_player_mode).w
+	bne.s	loc_40338
+
+loc_40330:
+	move.w	(a0)+,(a1)+
+	dbf	d1,loc_40330
+
+return_40336:
+	rts
+; ===========================================================================
+
+loc_40338:
+	move.w	(a0)+,d0
+	move.w	d0,d1
+	andi.w	#$F800,d0
+	andi.w	#$7FF,d1
+	lsr.w	#1,d1
+	or.w	d1,d0
+	move.w	d0,(a1)+
+	dbf	d1,loc_40338
+	rts
+; ===========================================================================
+
+; --------------------------------------------------------------------------------------
+; Animated Pattern Mappings (16x16)
+; --------------------------------------------------------------------------------------
+; off_40350:
+AnimPatMaps:
+	dc.w APM16_EHZ-AnimPatMaps ;  0
+	dc.w APM_Null-AnimPatMaps  ;  1
+	dc.w APM_Null-AnimPatMaps  ;  2
+	dc.w APM_Null-AnimPatMaps  ;  3
+	dc.w APM16_MTZ-AnimPatMaps ;  4
+	dc.w APM16_MTZ-AnimPatMaps ;  5
+	dc.w APM_Null-AnimPatMaps  ;  6
+	dc.w APM16_EHZ-AnimPatMaps ;  7
+	dc.w APM_HPZ-AnimPatMaps   ;  8
+	dc.w APM_Null-AnimPatMaps  ;  9
+	dc.w APM_OOZ-AnimPatMaps   ; $A
+	dc.w APM_Null-AnimPatMaps  ; $B
+	dc.w APM_CNZ-AnimPatMaps   ; $C
+	dc.w APM_CPZ-AnimPatMaps   ; $D
+	dc.w APM_DEZ-AnimPatMaps   ; $E
+	dc.w APM_ARZ-AnimPatMaps   ; $F
+	dc.w APM_Null-AnimPatMaps  ;$10
+; byte_40372:
+APM16_EHZ:	BINCLUDE	"mappings/16x16/AnimEHZ.bin"
+
+; byte_403EE:
+APM16_MTZ:	BINCLUDE	"mappings/16x16/AnimMTZ.bin"
+
+; byte_404C2:
+APM_HPZ:	BINCLUDE	"mappings/16x16/AnimHPZ.bin"
+
+; byte_405B6:
+APM_OOZ:	BINCLUDE	"mappings/16x16/AnimOOZ.bin"
+
+; byte_4061A:
+APM_CNZ:	BINCLUDE	"mappings/16x16/AnimCNZ.bin"
+
+; byte_406BE:
+APM_CNZ2P:	BINCLUDE	"mappings/16x16/AnimCNZ2P.bin"
+
+; byte_40762:
+APM_CPZ:	BINCLUDE	"mappings/16x16/AnimCPZ.bin"
+
+; byte_4076E:
+APM_DEZ:	BINCLUDE	"mappings/16x16/AnimDEZ.bin"
+
+; byte_4077A:
+APM_ARZ:	BINCLUDE	"mappings/16x16/AnimARZ.bin"
+
+; byte_407BE:
+APM_Null:	dc.w   0
+; ===========================================================================
+
+loc_407C0:
+	lea	(ArtUnc_HTZCliffs).l,a0
+	lea	(Object_RAM+$800).w,a4
+	bsr.w	JmpTo2_NemDecToRAM
+	lea	(Object_RAM+$800).w,a1
+	lea	word_3FD9C(pc),a4
+	moveq	#0,d2
+	moveq	#7,d4
+
+loc_407DA:
+	moveq	#5,d3
+
+loc_407DC:
+	moveq	#-1,d0
+	move.w	(a4)+,d0
+	movea.l	d0,a2
+	moveq	#$1F,d1
+
+loc_407E4:
+	move.l	(a1),(a2)+
+	move.l	d2,(a1)+
+	dbf	d1,loc_407E4
+	dbf	d3,loc_407DC
+	adda.w	#$C,a4
+	dbf	d4,loc_407DA
+	rts
+; ===========================================================================
+	nop
+
+JmpTo2_NemDecToRAM 
+	jmp	(NemDec_RAM).l
+; ===========================================================================
+
+;---------------------------------------------------------------------------------------
+; Nemesis compressed art (192 blocks)
+; Dynamically reloaded cliffs in background from HTZ ; ArtNem_49A14: ArtUnc_HTZCliffs:
+artunc_htzcliffs:	BINCLUDE	"art/nemesis/Dynamically reloaded cliffs in HTZ background.bin"
+		even
+		
+; ===========================================================================
+; HTZ mountain art main RAM addresses?
+word_3FD9C:
+	dc.w   $80, $180, $280, $580, $600, $700	; 6
+	dc.w   $80, $180, $280, $580, $600, $700	; 12
+	dc.w  $980, $A80, $B80, $C80, $D00, $D80	; 18
+	dc.w  $980, $A80, $B80, $C80, $D00, $D80	; 24
+	dc.w  $E80,$1180,$1200,$1280,$1300,$1380	; 30
+	dc.w  $E80,$1180,$1200,$1280,$1300,$1380	; 36
+	dc.w $1400,$1480,$1500,$1580,$1600,$1900	; 42
+	dc.w $1400,$1480,$1500,$1580,$1600,$1900	; 48
+	dc.w $1D00,$1D80,$1E00,$1F80,$2400,$2580	; 54
+	dc.w $1D00,$1D80,$1E00,$1F80,$2400,$2580	; 60
+	dc.w $2600,$2680,$2780,$2B00,$2F00,$3280	; 66
+	dc.w $2600,$2680,$2780,$2B00,$2F00,$3280	; 72
+	dc.w $3600,$3680,$3780,$3C80,$3D00,$3F00	; 78
+	dc.w $3600,$3680,$3780,$3C80,$3D00,$3F00	; 84
+	dc.w $3F80,$4080,$4480,$4580,$4880,$4900	; 90
+	dc.w $3F80,$4080,$4480,$4580,$4880,$4900	; 96
+	
 ; ---------------------------------------------------------------------------
 ; Subroutine to draw the HUD
 ; ---------------------------------------------------------------------------
